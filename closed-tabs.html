@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  TAB MANAGEMENT SYSTEM — BOILERPLATE TEMPLATE
+  File: closed-tabs.html (Closed Tabs History)
+  ============================================================
+  !! THIS IS A BOILERPLATE STRUCTURE ONLY !!
+  !! No JavaScript logic is implemented.   !!
+  !! Extend freely for your own application. !!
+  ============================================================
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TabFlow — Closed Tabs</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR (shared) -->
+  <aside class="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-icon" aria-hidden="true">🍺</div>
+      <div>
+        <div class="sidebar__brand-name">TabFlow</div>
+        <div class="sidebar__brand-sub">Hospitality</div>
+      </div>
+    </div>
+    <nav class="sidebar__nav">
+      <ul class="sidebar__nav-section">
+        <li class="sidebar__nav-section-label">Main</li>
+        <li>
+          <a href="index.html" class="sidebar__nav-link">
+            <svg class="sidebar__nav-link-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7m-9 0v10m-3-3h6" />
+            </svg>
+            Dashboard
+            <span class="sidebar__nav-badge">3</span>
+          </a>
+        </li>
+        <li>
+          <a href="menu.html" class="sidebar__nav-link">
+            <svg class="sidebar__nav-link-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
+                   M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Menu
+          </a>
+        </li>
+        <li>
+          <a href="closed-tabs.html" class="sidebar__nav-link sidebar__nav-link--active" aria-current="page">
+            <svg class="sidebar__nav-link-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10
+                   a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+            Closed Tabs
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="sidebar__footer"><p>TabFlow v1.0 — Boilerplate</p></div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="app-content">
+
+    <header class="topbar">
+      <div class="topbar__breadcrumb">
+        <a href="index.html">TabFlow</a>
+        <span class="topbar__breadcrumb-sep">›</span>
+        <span class="topbar__breadcrumb-current">Closed Tabs</span>
+      </div>
+      <div class="topbar__actions">
+        <!-- Date filter placeholder — JS required for actual filtering -->
+        <select class="form-select" style="width:160px; padding:7px 12px;"
+          aria-label="Filter by date">
+          <option>Today</option>
+          <option>This Week</option>
+          <option>This Month</option>
+          <option>All Time</option>
+        </select>
+        <!-- Export placeholder — JS required -->
+        <button class="btn btn--secondary" type="button">↓ Export CSV</button>
+      </div>
+    </header>
+
+    <main class="page" id="main-content">
+
+      <div class="page__header">
+        <div class="page__title-group">
+          <h1 class="page__title">Closed Tabs</h1>
+          <p class="page__subtitle">History of settled and closed customer tabs</p>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           SUMMARY STATS (closed tabs context)
+      =========================================== -->
+      <div class="stats-row" style="margin-bottom: var(--space-xl);" aria-label="Closed tab statistics">
+
+        <div class="stat-card">
+          <span class="stat-card__label">Closed Today</span>
+          <span class="stat-card__value stat-card__value--success">8</span>
+          <span class="stat-card__sub">Tabs settled</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-card__label">Today's Revenue</span>
+          <span class="stat-card__value">€384</span>
+          <span class="stat-card__sub">From closed tabs</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-card__label">Avg. Tab</span>
+          <span class="stat-card__value">€48</span>
+          <span class="stat-card__sub">Per closed tab today</span>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           CLOSED TABS TABLE
+           Rows populated via JavaScript.
+      =========================================== -->
+      <div class="closed-tabs-table-wrap">
+        <table class="closed-tabs-table" aria-label="Closed tabs">
+          <thead>
+            <tr>
+              <th scope="col">Table</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Section</th>
+              <th scope="col">Items</th>
+              <th scope="col">Opened</th>
+              <th scope="col">Closed</th>
+              <th scope="col">Total</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- ---- Row 1 (placeholder) ---- -->
+            <tr>
+              <td>Table 2</td>
+              <td>Anna Bergmann</td>
+              <td>Main Hall</td>
+              <td class="td--mono">4</td>
+              <td class="td--mono">18:10</td>
+              <td class="td--mono">19:55</td>
+              <td class="td--total">€62.00</td>
+              <td><span class="badge badge--closed">Settled</span></td>
+              <td>
+                <button class="btn btn--ghost btn--sm" type="button">View</button>
+              </td>
+            </tr>
+
+            <!-- ---- Row 2 (placeholder) ---- -->
+            <tr>
+              <td>Bar 1</td>
+              <td>—</td>
+              <td>Bar Seating</td>
+              <td class="td--mono">2</td>
+              <td class="td--mono">18:30</td>
+              <td class="td--mono">19:20</td>
+              <td class="td--total">€21.50</td>
+              <td><span class="badge badge--closed">Settled</span></td>
+              <td>
+                <button class="btn btn--ghost btn--sm" type="button">View</button>
+              </td>
+            </tr>
+
+            <!-- ---- Row 3 (placeholder) ---- -->
+            <tr>
+              <td>Table 9</td>
+              <td>Marco &amp; Elisa</td>
+              <td>Terrace</td>
+              <td class="td--mono">11</td>
+              <td class="td--mono">17:45</td>
+              <td class="td--mono">20:10</td>
+              <td class="td--total">€134.80</td>
+              <td><span class="badge badge--closed">Settled</span></td>
+              <td>
+                <button class="btn btn--ghost btn--sm" type="button">View</button>
+              </td>
+            </tr>
+
+            <!-- ---- Row 4 (placeholder) ---- -->
+            <tr>
+              <td>Table 3</td>
+              <td>Birthday Group</td>
+              <td>VIP Area</td>
+              <td class="td--mono">18</td>
+              <td class="td--mono">19:00</td>
+              <td class="td--mono">22:30</td>
+              <td class="td--total">€287.00</td>
+              <!-- Example: tab closed but not yet settled -->
+              <td><span class="badge badge--pending">Pending</span></td>
+              <td>
+                <button class="btn btn--ghost btn--sm" type="button">View</button>
+              </td>
+            </tr>
+
+            <!-- ---- Row 5 (placeholder) ---- -->
+            <tr>
+              <td>Bar 3</td>
+              <td>Tom Keller</td>
+              <td>Bar Seating</td>
+              <td class="td--mono">3</td>
+              <td class="td--mono">20:05</td>
+              <td class="td--mono">20:48</td>
+              <td class="td--total">€19.00</td>
+              <td><span class="badge badge--closed">Settled</span></td>
+              <td>
+                <button class="btn btn--ghost btn--sm" type="button">View</button>
+              </td>
+            </tr>
+
+            <!--
+              PLACEHOLDER: Remaining rows rendered here by JavaScript
+              from your data store. Add pagination controls as needed.
+            -->
+
+          </tbody>
+        </table>
+      </div>
+      <!-- /closed-tabs-table-wrap -->
+
+      <!-- Pagination placeholder — implement via JS -->
+      <div class="flex flex--between flex--center" style="margin-top: var(--space-lg);">
+        <p class="text--muted" style="font-size:0.82rem;">
+          Showing 5 of 8 closed tabs today
+        </p>
+        <div class="flex flex--gap-sm">
+          <button class="btn btn--secondary btn--sm" type="button" disabled>← Previous</button>
+          <button class="btn btn--secondary btn--sm" type="button">Next →</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>
