@@ -109,10 +109,10 @@
 
           <!-- ---- Category Filter Sidebar ---- -->
           <aside aria-label="Filter by category">
-            <nav class="menu-categories">
-              <ul>
+            <nav id="card-grid" class="menu-categories">
+              <ul id="card grid">
                 <!-- Active category — JS toggles .menu-category-link--active -->
-                
+
               </ul>
               <!-- Add category — JS required -->
               <div style="padding: 8px;">
@@ -176,7 +176,7 @@
           <label class="form-label" for="item-category">Category</label>
           <select class="form-select" id="item-category">
             <option value="">— Select category —</option>
-            
+
           </select>
         </div>
 
@@ -217,7 +217,7 @@
 
       <div class="modal__header">
         <h2 class="modal__title" id="modal-new-category-title">Add Category</h2>
-        <button class="modal__close" type="button" aria-label="Close modal">✕</button>
+        <button id="close-category-create" class="modal__close" type="button" aria-label="Close modal">✕</button>
       </div>
 
       <div class="modal__body">
@@ -235,31 +235,62 @@
           <span class="form-hint">Paste any emoji to use as the category icon</span>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="category-desc">Description</label>
-          <input class="form-input" id="category-desc" type="text" placeholder="Short description (optional)" />
-        </div>
-
-        <div class="form-group">
-          <span class="form-label">Visibility</span>
-          <label class="toggle">
-            <div class="toggle__track is-on">
-              <div class="toggle__thumb"></div>
-            </div>
-            <span class="toggle__label">Show in ordering menu</span>
-          </label>
-        </div>
-
       </div>
 
       <div class="modal__footer">
-        <button class="btn btn--ghost" type="button">Cancel</button>
-        <button class="btn btn--primary" type="button">Save Category</button>
+        <button id="cancel-category-create" class="btn btn--ghost" type="button">Cancel</button>
+        <button id="create-btn-category" class="btn btn--primary" type="button">Save Category</button>
       </div>
 
     </div>
   </div>
   <!-- /modal-menu-item -->
+  <!-- =====================================================
+     DELETE MODAL — Shared for tabs, categories and items
+     Show by setting style="display: flex;"
+     Hide by setting style="display: none;"
+====================================================== -->
+  <div class="modal-overlay" id="modal-delete" role="dialog" aria-modal="true" aria-labelledby="modal-delete-title"
+    style="display: flex;">
+
+    <div class="modal">
+
+      <div class="modal__header">
+        <!-- Title updated via JS — e.g. "Close Tab", "Delete Category", "Delete Item" -->
+        <h2 class="modal__title" id="modal-delete-title">Delete</h2>
+        <button class="modal__close" type="button" aria-label="Close modal"
+          onclick="document.getElementById('modal-delete').style.display='none'">✕</button>
+      </div>
+
+      <div class="modal__body">
+
+        <!-- Warning icon -->
+        <div style="text-align: center; font-size: 2.5rem; margin-bottom: var(--space-md);">⚠️</div>
+
+        <!-- Static heading -->
+        <h3 style="text-align: center; margin-bottom: var(--space-sm);">Are you sure?</h3>
+
+        <!-- Dynamic message updated via JS before showing -->
+        <p id="modal-delete-message" style="text-align: center;
+        color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6;">
+          This action cannot be undone.
+        </p>
+
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--ghost" type="button"
+          onclick="document.getElementById('modal-delete').style.display='none'">
+          Cancel
+        </button>
+        <!-- Label updated via JS — e.g. "Close Tab", "Delete Category", "Delete Item" -->
+        <button class="btn btn--danger" type="button" id="modal-delete-confirm">
+          Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
 
 
 </body>

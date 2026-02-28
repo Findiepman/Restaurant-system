@@ -10,6 +10,12 @@ export const elements = {
     itemName: document.getElementById("item-name")! as HTMLInputElement,
     itemPrice: document.getElementById("item-price")! as HTMLInputElement,
     createCategoryBtn: document.getElementById("create-category")! as HTMLButtonElement,
-    categoryCreationModal: document.getElementById("modal-new-category")! as HTMLDivElement
-
+    categoryCreationModal: document.getElementById("modal-new-category")! as HTMLDivElement,
+    categoryName: document.getElementById("category-name")! as HTMLInputElement,
+    categoryIcon: document.getElementById("category-icon")! as HTMLInputElement,
+    createCategoryBtnFinal: document.getElementById("create-btn-category")! as HTMLButtonElement,
+    cancelCategorybtn: document.getElementById("cancel-category-create")! as HTMLButtonElement,
+    closeCategoryCreate: document.getElementById("close-category-create")! as HTMLButtonElement,
+    categoryGrid: document.getElementById("card grid")! as HTMLUListElement,
+    itemCategory: document.getElementById("item-category")! as HTMLSelectElement,
 }
