@@ -13,7 +13,7 @@ export function createItem(name: string, price: number, category: string, desc: 
             category: category,
             desc: desc,
         }
-        currentMenu.push(newItem);       
+        currentMenu.push(newItem);
         totalItems += 1
         saveMenu(currentMenu);
         renderItems()
@@ -39,6 +39,18 @@ export function renderCategories() {
     grid.innerHTML = ""
 
     const currentCategory = getCategories()
+    const allItems = document.createElement("button")
+    allItems.className = "menu-category-link menu-category-link--active"
+    allItems.style.width = "100%"
+    allItems.style.justifyContent = "center"
+    allItems.style.border = "1px solid #2a3047"
+    allItems.style.borderRadius = "8px"
+    allItems.textContent = "All Items"
+    grid.appendChild(allItems)
+    allItems.addEventListener("click", () => {
+        renderItems("all")
+    })
+    
 
     currentCategory.forEach((category) => {
         const li = document.createElement("li")
@@ -49,6 +61,7 @@ export function renderCategories() {
         button.style.border = "1px solid #2a3047"
         button.style.borderRadius = "8px"
         button.style.justifyContent = "center"
+        button.style.margin = "5px 0px 5px 0px"
         button.addEventListener("mouseenter", () => {
             button.style.backgroundColor = "#2a3047"
         })
@@ -68,17 +81,49 @@ export function renderCategories() {
         const name = document.createElement("span")
         name.textContent = `${category.icon} | ${category.name}`
 
-
-        button.appendChild(name)
+        button.addEventListener("click", () => {
+            renderItems(category.name)
+        })
+        
         li.appendChild(button)
+        button.appendChild(name)
         grid.appendChild(li)
     })
 }
-
-export function renderItems() {
+function isCategoryEmpty(categoryId: string): boolean {
+    const menu = getMenu();
+    
+    // Check of er MINSTENS één item is met deze categoryId
+    const hasItems = menu.some(item => item.category === categoryId);
+    
+    // Als hasItems 'false' is, dan is de categorie leeg
+    return !hasItems; 
+}
+export function renderItems(categoryFilter: string = "all") {
     const grid = elements.itemGrid
-    const currentMenu = getMenu();
+    let currentMenu = getMenu();
     grid.innerHTML = ""
+
+    if (categoryFilter !== "all") {
+        currentMenu = currentMenu.filter(item => item.category === categoryFilter)
+        if (isCategoryEmpty(categoryFilter) == true) {
+            const card = document.createElement("div")
+            card.className = "menu-item-card"
+            const cardBody = document.createElement("div")
+            cardBody.className = "menu-item-card__body"
+            const text = document.createElement("h3") 
+            text.textContent = "No items yet.."
+            text.className = "menu-item-card__name"
+            const cardDesc = document.createElement("p")
+            cardDesc.className = "menu-item-card__desc"
+            cardDesc.textContent = "This category has no items. Add one using the button above."
+
+            cardBody.appendChild(text)
+            cardBody.appendChild(cardDesc)
+            card.appendChild(cardBody)
+            grid.appendChild(card)
+        }
+    }
 
     currentMenu.forEach((item) => {
         const card = document.createElement("article")

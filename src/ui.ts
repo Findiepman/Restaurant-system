@@ -1,5 +1,5 @@
 import { elements } from "./elements.js";
-import { createCategory, createItem,deleteCategory,deleteItem,renderItems } from "./menu.js";
+import { createCategory, createItem, deleteCategory, deleteItem, renderItems } from "./menu.js";
 import { saveMenu, getMenu, getCategories } from "./state.js";
 const currentCategory = getCategories()
 let itemToDeleteId: string | null = null;
@@ -16,14 +16,19 @@ function clearInput() {
 }
 elements.createItemBtn.addEventListener("click", () => {
     elements.createItemModal.style.display = "flex";
-    const selectElement = elements.itemCategory
+    const selectElement = elements.itemCategory;
+
+    // 1. Maak de select eerst helemaal leeg
+    selectElement.innerHTML = '<option value="">Select a category</option>';
+
+    // 2. Voeg daarna pas de categorieën toe
     currentCategory.forEach((category) => {
-        const categoryItem = document.createElement("option")
-        categoryItem.value = category.name
-        categoryItem.textContent = `${category.icon} | ${category.name}`
-        selectElement.appendChild(categoryItem)
-    })
-})
+        const categoryItem = document.createElement("option");
+        categoryItem.value = category.name;
+        categoryItem.textContent = `${category.icon} | ${category.name}`;
+        selectElement.appendChild(categoryItem);
+    });
+});
 elements.cancelItemBtn.addEventListener("click", () => {
     elements.createItemModal.style.display = "none"
     clearInput()
@@ -33,7 +38,7 @@ elements.closeItemBtn.addEventListener("click", () => {
     clearInput()
 })
 elements.createItemModalBtn.addEventListener("click", () => {
-    if (elements.itemName.value == "" || elements.itemPrice.value == "" || elements.itemCategory.value === "") {console.log("nonono")}
+    if (elements.itemName.value == "" || elements.itemPrice.value == "" || elements.itemCategory.value === "") { console.log("nonono") }
 
     else {
         createItem(elements.itemName.value, parseFloat(elements.itemPrice.value), elements.itemCategory.value, elements.itemDesc.value)
@@ -64,7 +69,7 @@ elements.deleteItemConfirm.addEventListener("click", () => {
         elements.deleteItemModal.style.display = "none";
         clearInput()
         delete elements.deleteItemConfirm.dataset.id;
-        
+
     }
 })
 elements.deleteCategoryConfirm.addEventListener("click", () => {
