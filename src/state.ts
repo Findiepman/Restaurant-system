@@ -4,6 +4,7 @@ export interface MenuItem {
     name: string;
     price: number;
     category: string;
+    desc: string;
 }
 
 export interface Tab {

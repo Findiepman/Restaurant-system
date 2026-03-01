@@ -1,4 +1,4 @@
-import { createCategory } from "./menu";
+import { createCategory, deleteCategory } from "./menu";
 
 export const elements = {
     itemGrid: document.getElementById("items-grid")! as HTMLDivElement,
@@ -18,4 +18,9 @@ export const elements = {
     closeCategoryCreate: document.getElementById("close-category-create")! as HTMLButtonElement,
     categoryGrid: document.getElementById("card grid")! as HTMLUListElement,
     itemCategory: document.getElementById("item-category")! as HTMLSelectElement,
+    deleteItemModal: document.getElementById("modal-delete-item")! as HTMLDivElement,
+    deleteItemConfirm: document.getElementById("modal-delete-item-confirm")! as HTMLButtonElement,
+    deleteCategoryModal: document.getElementById("modal-delete-category")! as HTMLDivElement,
+    deleteCategoryConfirm: document.getElementById("modal-delete-category-confirm")! as HTMLButtonElement,
+    itemDesc: document.getElementById("item-desc")! as HTMLInputElement,
 }

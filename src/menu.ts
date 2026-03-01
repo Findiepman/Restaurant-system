@@ -1,25 +1,26 @@
 import { getCategories, getMenu, saveCategory, saveMenu } from "./state.js";
 import { elements } from "./elements.js";
-const currentMenu = getMenu();
-const currentCategory = getCategories()
+
 let totalItems = 0
-export function createItem(name: string, price: number, category: string) {
+export function createItem(name: string, price: number, category: string, desc: string) {
     const existingItem = getMenu().some(item => item.name.toLocaleLowerCase().trim() === name.toLocaleLowerCase().trim())
+    const currentMenu = getMenu();
     if (!existingItem && name && price) {
         const newItem = {
             name: name,
             id: crypto.randomUUID(),
             price: price,
-            category: category
+            category: category,
+            desc: desc,
         }
-        currentMenu.push(newItem);
-        renderItems()
+        currentMenu.push(newItem);       
         totalItems += 1
         saveMenu(currentMenu);
+        renderItems()
     }
 }
 export function createCategory(name: string, icon: string) {
-
+    const currentCategory = getCategories()
     const existingCategory = getCategories().some(category => category.name.toLocaleLowerCase().trim() === name.toLocaleLowerCase().trim())
     if (!existingCategory && name && icon) {
         const category = {
@@ -30,12 +31,14 @@ export function createCategory(name: string, icon: string) {
         currentCategory.push(category)
         console.log(category)
         saveCategory(currentCategory)
-
+        renderCategories()
     }
 }
 export function renderCategories() {
     const grid = elements.categoryGrid
     grid.innerHTML = ""
+
+    const currentCategory = getCategories()
 
     currentCategory.forEach((category) => {
         const li = document.createElement("li")
@@ -56,7 +59,10 @@ export function renderCategories() {
         button.className = "menu-category-link"
         button.dataset.id = String(category.id)
         button.addEventListener("click", (e) => {
-            if (e.ctrlKey) {alert("ctrl key pressed!")} 
+            if (e.ctrlKey) {
+                elements.deleteCategoryConfirm.dataset.id = category.id;
+                elements.deleteCategoryModal.style.display = "flex"
+            }
         })
 
         const name = document.createElement("span")
@@ -71,6 +77,7 @@ export function renderCategories() {
 
 export function renderItems() {
     const grid = elements.itemGrid
+    const currentMenu = getMenu();
     grid.innerHTML = ""
 
     currentMenu.forEach((item) => {
@@ -85,7 +92,7 @@ export function renderItems() {
         itemName.textContent = item.name
         itemName.className = "menu-item-card__name"
         const itemDesc = document.createElement("p")
-        itemDesc.textContent = "WIP"
+        itemDesc.textContent = `${item.desc}`
         itemDesc.className = "menu-item-card__desc"
         itemBody.appendChild(category)
         itemBody.appendChild(itemName)
@@ -110,6 +117,10 @@ export function renderItems() {
         deleteBtn.className = "btn btn--danger btn--sm"
         deleteBtn.textContent = "Delete Item"
         buttons.appendChild(deleteBtn)
+        deleteBtn.addEventListener("click", () => {
+            elements.deleteItemConfirm.dataset.id = item.id;
+            elements.deleteItemModal.style.display = "flex"
+        })
 
         card.appendChild(itemBody)
         card.appendChild(itemFooter)
@@ -117,5 +128,26 @@ export function renderItems() {
         grid.appendChild(card)
     });
 }
+
+export function deleteItem(id: string) {
+    const menu = getMenu();
+    const updatedMenu = menu.filter(item => item.id !== id);
+    saveMenu(updatedMenu);
+    renderItems();
+}
+export function deleteCategory(id: string) {
+    const categories = getCategories();
+    const menu = getMenu();
+    const isUsed = menu.some(item => item.id === id);
+    if (isUsed) {
+        alert("Cannot delete: This category still has items assigned to it!");
+        return;
+    }
+    const updatedCategories = categories.filter(cat => cat.id !== id);
+    saveCategory(updatedCategories);
+    renderCategories();
+}
+
+
 renderItems()
 renderCategories()
