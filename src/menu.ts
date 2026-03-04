@@ -36,6 +36,7 @@ export function createCategory(name: string, icon: string) {
 }
 export function renderCategories() {
     const grid = elements.categoryGrid
+    if (!grid) return; // Exit if element doesn't exist on this page
     grid.innerHTML = ""
 
     const currentCategory = getCategories()
@@ -50,7 +51,7 @@ export function renderCategories() {
     allItems.addEventListener("click", () => {
         renderItems("all")
     })
-    
+
 
     currentCategory.forEach((category) => {
         const li = document.createElement("li")
@@ -84,7 +85,7 @@ export function renderCategories() {
         button.addEventListener("click", () => {
             renderItems(category.name)
         })
-        
+
         li.appendChild(button)
         button.appendChild(name)
         grid.appendChild(li)
@@ -92,15 +93,16 @@ export function renderCategories() {
 }
 function isCategoryEmpty(categoryId: string): boolean {
     const menu = getMenu();
-    
+
     // Check of er MINSTENS één item is met deze categoryId
     const hasItems = menu.some(item => item.category === categoryId);
-    
+
     // Als hasItems 'false' is, dan is de categorie leeg
-    return !hasItems; 
+    return !hasItems;
 }
 export function renderItems(categoryFilter: string = "all") {
     const grid = elements.itemGrid
+    if (!grid) return; // Exit if element doesn't exist on this page
     let currentMenu = getMenu();
     grid.innerHTML = ""
 
@@ -111,7 +113,7 @@ export function renderItems(categoryFilter: string = "all") {
             card.className = "menu-item-card"
             const cardBody = document.createElement("div")
             cardBody.className = "menu-item-card__body"
-            const text = document.createElement("h3") 
+            const text = document.createElement("h3")
             text.textContent = "No items yet.."
             text.className = "menu-item-card__name"
             const cardDesc = document.createElement("p")

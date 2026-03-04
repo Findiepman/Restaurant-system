@@ -19,18 +19,19 @@ export function createTab(name: string, tableNumber: number) {
 }
 
 export function renderTabs() {
-    const grid = document.querySelector(".tabs-grid-67")! as HTMLDivElement
+    const grid = document.querySelector("#tabs-grid-67") as HTMLDivElement
+    if (!grid) console.log("wefwf"); // Exit if element doesn't exist on this page
 
     const tabs = getTabs()
 
     tabs.forEach((tab) => {
-        const card = document.createElement("article") 
+        const card = document.createElement("article")
         card.className = "tab-card"
-        const header = document.createElement("div") 
+        const header = document.createElement("div")
         header.className = "tab-card__header"
         const table = document.createElement("div")
         table.className = "tab-card__table"
-        table.textContent = tab.tableNumber.toString()
+        table.textContent = `Table ${tab.tableNumber.toString()}`
         const tableSection = document.createElement("div")
         tableSection.className = "tab-card__table-sub"
         tableSection.textContent = "WIP"
@@ -45,9 +46,9 @@ export function renderTabs() {
 
         const meta = document.createElement("div")
         meta.className = "tab-card__meta"
-        
+
         const items = document.createElement("span")
-        items.className = "tab-card__items-count" 
+        items.className = "tab-card__items-count"
         items.textContent = tab.items.length.toString()
         const price = document.createElement("span")
         price.className = "tab-card__total"
@@ -71,7 +72,7 @@ export function renderTabs() {
         actions.appendChild(deletebtn)
 
 
-        
+
 
         header.appendChild(table)
         card.appendChild(customer)
