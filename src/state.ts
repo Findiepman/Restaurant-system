@@ -10,6 +10,7 @@ export interface MenuItem {
 export interface Tab {
     id: string;
     tableNumber: number;
+    name: string,
     items: MenuItem[];
     isOpen: boolean;
 }

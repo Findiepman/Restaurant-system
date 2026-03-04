@@ -177,7 +177,7 @@
            Each card links to tab-detail.html
            Cards populated dynamically via JS
       =========================================== -->
-        <div class="tab-grid" role="list" aria-label="Active tabs">
+        <div id="tabs-grid-67" class="tab-grid" role="list" aria-label="Active tabs">
 
         </div>
         <!-- /tab-grid -->
@@ -204,13 +204,13 @@
 
       <div class="modal__header">
         <h2 class="modal__title" id="modal-new-tab-title">Open New Tab</h2>
-        <button class="modal__close" type="button" aria-label="Close modal">✕</button>
+        <button id="close-tab-modal" class="modal__close" type="button" aria-label="Close modal">✕</button>
       </div>
 
       <div class="modal__body">
 
         <div class="form-group">
-          <label class="form-label form-label--required" for="new-tab-table">
+          <label id="table-number-tab"class="form-label form-label--required" for="new-tab-table">
             Table Number
           </label>
           <input class="form-input" id="new-tab-table" type="text" placeholder="e.g. 4, Bar 2, Terrace 1" required />
@@ -223,16 +223,6 @@
           <input class="form-input" id="new-tab-customer" type="text" placeholder="e.g. John Smith" />
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="new-tab-section">Section / Area</label>
-          <select class="form-select" id="new-tab-section">
-            <option value="">— Select section —</option>
-            <option value="main">Main Hall</option>
-            <option value="bar">Bar Seating</option>
-            <option value="terrace">Terrace</option>
-            <option value="vip">VIP Area</option>
-          </select>
-        </div>
 
         <div class="form-group">
           <label class="form-label" for="new-tab-notes">Notes</label>
@@ -242,8 +232,8 @@
       </div>
 
       <div class="modal__footer">
-        <button class="btn btn--ghost" type="button">Cancel</button>
-        <button class="btn btn--primary" type="button">Open Tab</button>
+        <button id="create-tab-cancel" class="btn btn--ghost" type="button">Cancel</button>
+        <button id="create-tab-btn" class="btn btn--primary" type="button">Open Tab</button>
       </div>
 
     </div>

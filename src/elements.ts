@@ -23,4 +23,12 @@ export const elements = {
     deleteCategoryModal: document.getElementById("modal-delete-category")! as HTMLDivElement,
     deleteCategoryConfirm: document.getElementById("modal-delete-category-confirm")! as HTMLButtonElement,
     itemDesc: document.getElementById("item-desc")! as HTMLInputElement,
+    tabModal: document.getElementById("modal-new-tab")! as HTMLDivElement,
+    tabTableNum: document.getElementById("new-tab-table")! as HTMLInputElement,
+    tabCustomerName: document.getElementById("new-tab-customer")! as HTMLInputElement,
+    tabNotes: document.getElementById("new-tab-notes")! as HTMLInputElement,
+    tabsGrid: document.getElementById("tabs-grid-67")! as HTMLDivElement,
+    createTabBtn: document.getElementById("create-tab-btn")! as HTMLButtonElement,
+    cancelTabBtn: document.getElementById("create-tab-cancel")! as HTMLButtonElement,
+    closeTabBtn: document.getElementById("close-tab-modal")! as HTMLButtonElement
 }

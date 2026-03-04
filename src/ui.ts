@@ -1,6 +1,7 @@
 import { elements } from "./elements.js";
 import { createCategory, createItem, deleteCategory, deleteItem, renderItems } from "./menu.js";
 import { saveMenu, getMenu, getCategories } from "./state.js";
+import { createTab } from "./tabs.js";
 const currentCategory = getCategories()
 let itemToDeleteId: string | null = null;
 
@@ -12,7 +13,9 @@ function clearInput() {
     elements.categoryName.value = ""
     elements.categoryIcon.value = ""
     elements.itemDesc.value = ""
-
+    elements.tabNotes.value = ""
+    elements.tabCustomerName.value = ""
+    elements.tabTableNum.value = ""
 }
 elements.createItemBtn.addEventListener("click", () => {
     elements.createItemModal.style.display = "flex";
@@ -61,6 +64,15 @@ elements.closeCategoryCreate.addEventListener("click", () => {
 elements.createCategoryBtnFinal.addEventListener("click", () => {
     createCategory(elements.categoryName.value, elements.categoryIcon.value)
     elements.categoryCreationModal.style.display = "none"
+})
+elements.cancelTabBtn.addEventListener("click", () => {
+    elements.tabModal.style.display = "none"
+})
+elements.closeTabBtn.addEventListener("click", () => {
+    elements.tabModal.style.display = "none"
+})
+elements.createTabBtn.addEventListener("click", () => {
+    
 })
 elements.deleteItemConfirm.addEventListener("click", () => {
     const id = elements.deleteItemConfirm.dataset.id
