@@ -1,7 +1,7 @@
 import { elements } from "./elements.js";
 import { createCategory, createItem, deleteCategory, deleteItem, renderItems } from "./menu.js";
 import { saveMenu, getMenu, getCategories } from "./state.js";
-import { createTab } from "./tabs.js";
+import { createTab, renderTabs } from "./tabs.js";
 const currentCategory = getCategories()
 let itemToDeleteId: string | null = null;
 
@@ -66,14 +66,40 @@ elements.createCategoryBtnFinal.addEventListener("click", () => {
     elements.categoryCreationModal.style.display = "none"
 })
 elements.cancelTabBtn.addEventListener("click", () => {
-    elements.tabModal.style.display = "none"
+    elements.tabModal.classList.remove("is-open");
+    elements.tabModal.style.display = "none";
 })
 elements.closeTabBtn.addEventListener("click", () => {
-    elements.tabModal.style.display = "none"
+    elements.tabModal.classList.remove("is-open");
+    elements.tabModal.style.display = "none";
 })
 elements.createTabBtn.addEventListener("click", () => {
-    
+    // ensure table number is passed as a number
+    const tableNum = Number(elements.tabTableNum.value);
+    if (!isNaN(tableNum) && elements.tabCustomerName.value) {
+        createTab(elements.tabCustomerName.value, tableNum);
+        // close and reset modal
+        elements.tabModal.classList.remove("is-open");
+        elements.tabModal.style.display = "none";
+        clearInput();
+        // re-render the tabs grid so the new tab appears
+        renderTabs();
+    } else {
+        console.warn("Invalid table number or customer name");
+    }
 })
+// debug: show button reference and log clicks
+console.log("tabModalBtn element", elements.tabModalBtn);
+if (elements.tabModalBtn) {
+    elements.tabModalBtn.addEventListener("click", () => {
+        console.log("tabModalBtn clicked");
+        elements.tabModal.style.display = "flex";
+        elements.tabModal.classList.add("is-open");
+    });
+} else {
+    console.error("tabModalBtn not found in DOM");
+}
+console.log("ewfwefwef")
 elements.deleteItemConfirm.addEventListener("click", () => {
     const id = elements.deleteItemConfirm.dataset.id
     if (id) {

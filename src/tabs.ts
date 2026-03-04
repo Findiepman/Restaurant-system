@@ -1,5 +1,5 @@
-import { elements } from "./elements";
-import { saveTabs, getTabs, getMenu, getCategories } from "./state";
+import { elements } from "./elements.js";
+import { saveTabs, getTabs, getMenu, getCategories } from "./state.js";
 
 
 export function createTab(name: string, tableNumber: number) {
@@ -19,8 +19,7 @@ export function createTab(name: string, tableNumber: number) {
 }
 
 export function renderTabs() {
-    const grid = elements.tabsGrid
-    grid.innerHTML = ""
+    const grid = document.querySelector(".tabs-grid-67")! as HTMLDivElement
 
     const tabs = getTabs()
 

@@ -1,4 +1,4 @@
-import { createCategory, deleteCategory } from "./menu";
+import { createCategory, deleteCategory } from "./menu.js";
 
 export const elements = {
     itemGrid: document.getElementById("items-grid")! as HTMLDivElement,
@@ -30,5 +30,7 @@ export const elements = {
     tabsGrid: document.getElementById("tabs-grid-67")! as HTMLDivElement,
     createTabBtn: document.getElementById("create-tab-btn")! as HTMLButtonElement,
     cancelTabBtn: document.getElementById("create-tab-cancel")! as HTMLButtonElement,
-    closeTabBtn: document.getElementById("close-tab-modal")! as HTMLButtonElement
+    closeTabBtn: document.getElementById("close-tab-modal")! as HTMLButtonElement,
+    tabModalBtn: document.getElementById("new-tab-btn")! as HTMLButtonElement,
+
 }

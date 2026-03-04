@@ -115,7 +115,7 @@
           </div>
 
           <!-- CTA: Open new tab modal — JS required for modal trigger -->
-          <button class="btn btn--primary" id="new-tab" type="button" aria-haspopup="dialog"
+          <button class="btn btn--primary" id="new-tab-btn" type="button" aria-haspopup="dialog"
             aria-controls="modal-new-tab">
             + New Tab
           </button>
@@ -210,7 +210,7 @@
       <div class="modal__body">
 
         <div class="form-group">
-          <label id="table-number-tab"class="form-label form-label--required" for="new-tab-table">
+          <label id="table-number-tab" class="form-label form-label--required" for="new-tab-table">
             Table Number
           </label>
           <input class="form-input" id="new-tab-table" type="text" placeholder="e.g. 4, Bar 2, Terrace 1" required />
@@ -240,7 +240,8 @@
   </div>
   <!-- /modal-new-tab -->
 
-
+  <script type="module" src="dist/ui.js"> </script>
+  <script type="module" src="dist/tabs.js"> </script>
 </body>
 
 </html>
