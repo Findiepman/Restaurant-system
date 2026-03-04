@@ -1,4 +1,4 @@
-import { elements } from "./elements.js";
+import { tab, detail } from "./elements.js";
 import { saveTabs, getTabs, getMenu, getCategories } from "./state.js";
 
 
@@ -11,16 +11,20 @@ export function createTab(name: string, tableNumber: number) {
             tableNumber: tableNumber,
             isOpen: true,
             id: crypto.randomUUID().toString(),
-            items: []
+            items: [],
+            total: 0,
+            time: new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).format(Date.now())
         }
         tabs.push(newTab)
         saveTabs(tabs)
+        renderTabs()
     }
 }
 
 export function renderTabs() {
-    const grid = document.querySelector("#tabs-grid-67") as HTMLDivElement
-    if (!grid) console.log("wefwf"); // Exit if element doesn't exist on this page
+    const grid = document.querySelector("#tabs-grid-67") as HTMLDivElement | null
+    if (!grid) return; // Exit if element doesn't exist on this page
+    grid.innerHTML = ""; // clear existing cards before rendering
 
     const tabs = getTabs()
 
@@ -49,10 +53,10 @@ export function renderTabs() {
 
         const items = document.createElement("span")
         items.className = "tab-card__items-count"
-        items.textContent = tab.items.length.toString()
+        items.textContent = `Total items: ${tab.items.length.toString()}`
         const price = document.createElement("span")
         price.className = "tab-card__total"
-        price.textContent = "WIP"
+        price.textContent = "Total $WIP"
         meta.appendChild(items)
         meta.appendChild(price)
 
@@ -72,7 +76,7 @@ export function renderTabs() {
         actions.appendChild(deletebtn)
 
 
-
+        card.addEventListener("click", () => openTabDetail(tab.id))
 
         header.appendChild(table)
         card.appendChild(customer)
@@ -84,4 +88,30 @@ export function renderTabs() {
     })
 }
 
-renderTabs()
+function openTabDetail(id: string) {
+    // navigate to detail page; the new page will run its own rendering logic
+    window.location.href = `tab-detail.html?id=${id}`;
+}
+function renderTabDetails() {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const tabId = urlParams.get('id');
+    if (!tabId) return; // nothing to do when no id present
+
+    const allTabs = getTabs();
+    const current = allTabs.find(t => t.id === tabId);
+    if (!current) return; // invalid id
+
+    detail.topDetails.textContent = `Table ${current.tableNumber} -- ${current.name}`;
+    detail.tableNumBig.textContent = `Table ${current.tableNumber}`;
+    detail.CustomerSectionTime.textContent = `${current.name} · WIP · Opened WIP`;
+    detail.ActivityTab.textContent = current.isOpen ? "Active" : "Inactive";
+
+    detail.tableNumSidebar.textContent = current.tableNumber.toString()
+    detail.customerNamesidebar.textContent = current.name
+    detail.TimeOpenedSidebar.textContent = current.time
+    detail.TotalItemsSidebar.textContent = current.items.toString()
+}
+
+renderTabDetails();
+renderTabs();

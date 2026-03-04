@@ -1,5 +1,5 @@
 import { getCategories, getMenu, saveCategory, saveMenu } from "./state.js";
-import { elements } from "./elements.js";
+import { menu } from "./elements.js";
 
 let totalItems = 0
 export function createItem(name: string, price: number, category: string, desc: string) {
@@ -35,7 +35,7 @@ export function createCategory(name: string, icon: string) {
     }
 }
 export function renderCategories() {
-    const grid = elements.categoryGrid
+    const grid = menu.categoryGrid
     if (!grid) return; // Exit if element doesn't exist on this page
     grid.innerHTML = ""
 
@@ -74,8 +74,8 @@ export function renderCategories() {
         button.dataset.id = String(category.id)
         button.addEventListener("click", (e) => {
             if (e.ctrlKey) {
-                elements.deleteCategoryConfirm.dataset.id = category.id;
-                elements.deleteCategoryModal.style.display = "flex"
+                menu.deleteCategoryConfirm.dataset.id = category.id;
+                menu.deleteCategoryModal.style.display = "flex"
             }
         })
 
@@ -101,7 +101,7 @@ function isCategoryEmpty(categoryId: string): boolean {
     return !hasItems;
 }
 export function renderItems(categoryFilter: string = "all") {
-    const grid = elements.itemGrid
+    const grid = menu.itemGrid
     if (!grid) return; // Exit if element doesn't exist on this page
     let currentMenu = getMenu();
     grid.innerHTML = ""
@@ -165,8 +165,8 @@ export function renderItems(categoryFilter: string = "all") {
         deleteBtn.textContent = "Delete Item"
         buttons.appendChild(deleteBtn)
         deleteBtn.addEventListener("click", () => {
-            elements.deleteItemConfirm.dataset.id = item.id;
-            elements.deleteItemModal.style.display = "flex"
+            menu.deleteItemConfirm.dataset.id = item.id;
+            menu.deleteItemModal.style.display = "flex"
         })
 
         card.appendChild(itemBody)
@@ -185,7 +185,8 @@ export function deleteItem(id: string) {
 export function deleteCategory(id: string) {
     const categories = getCategories();
     const menu = getMenu();
-    const isUsed = menu.some(item => item.id === id);
+    // category id is stored on items in the `category` field
+    const isUsed = menu.some(item => item.category === id);
     if (isUsed) {
         alert("Cannot delete: This category still has items assigned to it!");
         return;

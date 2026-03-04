@@ -10,9 +10,11 @@ export interface MenuItem {
 export interface Tab {
     id: string;
     tableNumber: number;
+    total: number
     name: string,
     items: MenuItem[];
     isOpen: boolean;
+    time: string
 }
 export interface Category {
     id: string;

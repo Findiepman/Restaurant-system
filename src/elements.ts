@@ -1,6 +1,7 @@
 import { createCategory, deleteCategory } from "./menu.js";
 
-export const elements = {
+//menu.html
+export const menu = {
     itemGrid: document.getElementById("items-grid")! as HTMLDivElement,
     createItemBtn: document.getElementById("create-item-btn")! as HTMLButtonElement,
     createItemModal: document.getElementById("modal-menu-item")! as HTMLDivElement,
@@ -23,6 +24,10 @@ export const elements = {
     deleteCategoryModal: document.getElementById("modal-delete-category")! as HTMLDivElement,
     deleteCategoryConfirm: document.getElementById("modal-delete-category-confirm")! as HTMLButtonElement,
     itemDesc: document.getElementById("item-desc")! as HTMLInputElement,
+}
+
+//index.html
+export const tab = {
     tabModal: document.getElementById("modal-new-tab")! as HTMLDivElement,
     tabTableNum: document.getElementById("new-tab-table")! as HTMLInputElement,
     tabCustomerName: document.getElementById("new-tab-customer")! as HTMLInputElement,
@@ -32,5 +37,28 @@ export const elements = {
     cancelTabBtn: document.getElementById("create-tab-cancel")! as HTMLButtonElement,
     closeTabBtn: document.getElementById("close-tab-modal")! as HTMLButtonElement,
     tabModalBtn: document.getElementById("new-tab-btn")! as HTMLButtonElement,
+    addItemModal: document.getElementById("modal-add-item")! as HTMLDivElement,
+}
+
+//tab-detail.html
+export const detail = {
+    topDetails: document.getElementById("table-num-customer-name")! as HTMLSpanElement,
+    closeTabBtnTop: document.getElementById("close-tab-btn")! as HTMLButtonElement,
+    tableNumBig: document.getElementById("table-number")! as HTMLTitleElement,
+    CustomerSectionTime: document.getElementById("customer-name-section-time")! as HTMLParagraphElement,
+    ActivityTab: document.getElementById("active-tab")! as HTMLSpanElement,
+    addOrderItemBtn: document.getElementById("add-order-item-tab-btn")! as HTMLButtonElement,
+    orderItemsList: document.getElementById("order-items-list")! as HTMLUListElement, // hier komen alle bestelde items
+    tabNotesDetail: document.getElementById("tab-notes")! as HTMLTextAreaElement,
+    saveNotesBtn: document.getElementById("save-notes-btn")! as HTMLButtonElement,
+    tableNumSidebar: document.getElementById("table-number-sidebar")! as HTMLSpanElement,
+    customerNamesidebar: document.getElementById("customer-name-sidebar")! as HTMLSpanElement,
+    TimeOpenedSidebar: document.getElementById("time-opened-sidebar")! as HTMLSpanElement,
+    TotalItemsSidebar: document.getElementById("items-length-sidebar")! as HTMLSpanElement,
+    totalExclusiefVat: document.getElementById("total-exclusief-vat")! as HTMLSpanElement,
+    totalPriceTab: document.getElementById("total-total-price")! as HTMLSpanElement,
+    addItemSidebarBtn: document.getElementById("add-item-sidebar")! as HTMLButtonElement,
+    closeTabSidebar: document.getElementById("close-tab-sidebar")! as HTMLButtonElement,
+    AddItemModal: document.getElementById("modal-add-item")! as HTMLDivElement,
 
 }

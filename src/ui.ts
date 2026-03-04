@@ -1,37 +1,37 @@
-import { elements } from "./elements.js";
+import { tab, menu, detail } from "./elements.js";
 import { createCategory, createItem, deleteCategory, deleteItem, renderItems } from "./menu.js";
 import { saveMenu, getMenu, getCategories } from "./state.js";
 import { createTab, renderTabs } from "./tabs.js";
 
-// IMMEDIATELY attach ALL tab modal buttons at the top
-if (elements.tabModalBtn && elements.tabModal) {
-    elements.tabModalBtn.addEventListener("click", () => {
-        elements.tabModal.style.display = "flex";
-        elements.tabModal.classList.add("is-open");
+// attach tab modal buttons
+if (tab.tabModalBtn && tab.tabModal) {
+    tab.tabModalBtn.addEventListener("click", () => {
+        tab.tabModal.style.display = "flex";
+        tab.tabModal.classList.add("is-open");
     });
 }
 
-if (elements.cancelTabBtn && elements.tabModal) {
-    elements.cancelTabBtn.addEventListener("click", () => {
-        elements.tabModal.classList.remove("is-open");
-        elements.tabModal.style.display = "none";
+if (tab.cancelTabBtn && tab.tabModal) {
+    tab.cancelTabBtn.addEventListener("click", () => {
+        tab.tabModal.classList.remove("is-open");
+        tab.tabModal.style.display = "none";
     });
 }
 
-if (elements.closeTabBtn && elements.tabModal) {
-    elements.closeTabBtn.addEventListener("click", () => {
-        elements.tabModal.classList.remove("is-open");
-        elements.tabModal.style.display = "none";
+if (tab.closeTabBtn && tab.tabModal) {
+    tab.closeTabBtn.addEventListener("click", () => {
+        tab.tabModal.classList.remove("is-open");
+        tab.tabModal.style.display = "none";
     });
 }
 
-if (elements.createTabBtn && elements.tabModal) {
-    elements.createTabBtn.addEventListener("click", () => {
-        const tableNum = Number(elements.tabTableNum.value);
-        if (!isNaN(tableNum) && elements.tabCustomerName.value) {
-            createTab(elements.tabCustomerName.value, tableNum);
-            elements.tabModal.classList.remove("is-open");
-            elements.tabModal.style.display = "none";
+if (tab.createTabBtn && tab.tabModal) {
+    tab.createTabBtn.addEventListener("click", () => {
+        const tableNum = Number(tab.tabTableNum.value);
+        if (!isNaN(tableNum) && tab.tabCustomerName.value) {
+            createTab(tab.tabCustomerName.value, tableNum);
+            tab.tabModal.classList.remove("is-open");
+            tab.tabModal.style.display = "none";
             clearInput();
             renderTabs();
         } else {
@@ -40,60 +40,29 @@ if (elements.createTabBtn && elements.tabModal) {
     });
 }
 
-// Attach all other tab modal buttons
-if (elements.cancelTabBtn && elements.tabModal) {
-    elements.cancelTabBtn.addEventListener("click", () => {
-        elements.tabModal.classList.remove("is-open");
-        elements.tabModal.style.display = "none";
-    });
-}
-
-if (elements.closeTabBtn && elements.tabModal) {
-    elements.closeTabBtn.addEventListener("click", () => {
-        elements.tabModal.classList.remove("is-open");
-        elements.tabModal.style.display = "none";
-    });
-}
-
-if (elements.createTabBtn && elements.tabModal) {
-    elements.createTabBtn.addEventListener("click", () => {
-        const tableNum = Number(elements.tabTableNum.value);
-        if (!isNaN(tableNum) && elements.tabCustomerName.value) {
-            createTab(elements.tabCustomerName.value, tableNum);
-            elements.tabModal.classList.remove("is-open");
-            elements.tabModal.style.display = "none";
-            clearInput();
-            renderTabs();
-        } else {
-            console.warn("Invalid table number or customer name");
-        }
-    });
-}
-
-const currentCategory = getCategories()
+const currentCategory = getCategories();
 let itemToDeleteId: string | null = null;
 
-
 function clearInput() {
-    if (elements.itemName) elements.itemName.value = ""
-    if (elements.itemPrice) elements.itemPrice.value = ""
-    if (elements.itemCategory) elements.itemCategory.value = ""
-    if (elements.categoryName) elements.categoryName.value = ""
-    if (elements.categoryIcon) elements.categoryIcon.value = ""
-    if (elements.itemDesc) elements.itemDesc.value = ""
-    if (elements.tabNotes) elements.tabNotes.value = ""
-    if (elements.tabCustomerName) elements.tabCustomerName.value = ""
-    if (elements.tabTableNum) elements.tabTableNum.value = ""
+    if (menu.itemName) menu.itemName.value = "";
+    if (menu.itemPrice) menu.itemPrice.value = "";
+    if (menu.itemCategory) menu.itemCategory.value = "";
+    if (menu.categoryName) menu.categoryName.value = "";
+    if (menu.categoryIcon) menu.categoryIcon.value = "";
+    if (menu.itemDesc) menu.itemDesc.value = "";
+    if (tab.tabNotes) tab.tabNotes.value = "";
+    if (tab.tabCustomerName) tab.tabCustomerName.value = "";
+    if (tab.tabTableNum) tab.tabTableNum.value = "";
 }
-if (elements.createItemBtn) {
-    elements.createItemBtn.addEventListener("click", () => {
-        elements.createItemModal.style.display = "flex";
-        const selectElement = elements.itemCategory;
 
-        // 1. Maak de select eerst helemaal leeg
+if (menu.createItemBtn) {
+    menu.createItemBtn.addEventListener("click", () => {
+        menu.createItemModal.style.display = "flex";
+        const selectElement = menu.itemCategory;
+
+        // empty select then populate categories
         selectElement.innerHTML = '<option value="">Select a category</option>';
 
-        // 2. Voeg daarna pas de categorieën toe
         currentCategory.forEach((category) => {
             const categoryItem = document.createElement("option");
             categoryItem.value = category.name;
@@ -102,74 +71,96 @@ if (elements.createItemBtn) {
         });
     });
 }
-if (elements.cancelItemBtn) {
-    elements.cancelItemBtn.addEventListener("click", () => {
-        elements.createItemModal.style.display = "none"
-        clearInput()
-    })
-}
-if (elements.closeItemBtn) {
-    elements.closeItemBtn.addEventListener("click", () => {
-        elements.createItemModal.style.display = "none"
-        clearInput()
-    })
-}
-if (elements.createItemModalBtn) {
-    elements.createItemModalBtn.addEventListener("click", () => {
-        if (elements.itemName.value == "" || elements.itemPrice.value == "" || elements.itemCategory.value === "") { console.log("nonono") }
 
-        else {
-            createItem(elements.itemName.value, parseFloat(elements.itemPrice.value), elements.itemCategory.value, elements.itemDesc.value)
-            elements.createItemModal.style.display = "none"
-            clearInput()
+if (menu.cancelItemBtn) {
+    menu.cancelItemBtn.addEventListener("click", () => {
+        menu.createItemModal.style.display = "none";
+        clearInput();
+    });
+}
+
+if (menu.closeItemBtn) {
+    menu.closeItemBtn.addEventListener("click", () => {
+        menu.createItemModal.style.display = "none";
+        clearInput();
+    });
+}
+
+if (menu.createItemModalBtn) {
+    menu.createItemModalBtn.addEventListener("click", () => {
+        if (
+            menu.itemName.value === "" ||
+            menu.itemPrice.value === "" ||
+            menu.itemCategory.value === ""
+        ) {
+            console.log("nonono");
+        } else {
+            createItem(
+                menu.itemName.value,
+                parseFloat(menu.itemPrice.value),
+                menu.itemCategory.value,
+                menu.itemDesc.value
+            );
+            menu.createItemModal.style.display = "none";
+            clearInput();
         }
-
-    })
-}
-if (elements.createCategoryBtn) {
-    elements.createCategoryBtn.addEventListener("click", () => {
-        elements.categoryCreationModal.style.display = "flex"
-    })
-}
-if (elements.cancelCategorybtn) {
-    elements.cancelCategorybtn.addEventListener("click", () => {
-        elements.categoryCreationModal.style.display = "none"
-        clearInput()
-    })
-}
-if (elements.closeCategoryCreate) {
-    elements.closeCategoryCreate.addEventListener("click", () => {
-        elements.categoryCreationModal.style.display = "none"
-        clearInput()
-    })
-}
-if (elements.createCategoryBtnFinal) {
-    elements.createCategoryBtnFinal.addEventListener("click", () => {
-        createCategory(elements.categoryName.value, elements.categoryIcon.value)
-        elements.categoryCreationModal.style.display = "none"
-    })
+    });
 }
 
-if (elements.deleteItemConfirm) {
-    elements.deleteItemConfirm.addEventListener("click", () => {
-        const id = elements.deleteItemConfirm.dataset.id
+if (menu.createCategoryBtn) {
+    menu.createCategoryBtn.addEventListener("click", () => {
+        menu.categoryCreationModal.style.display = "flex";
+    });
+}
+
+if (menu.cancelCategorybtn) {
+    menu.cancelCategorybtn.addEventListener("click", () => {
+        menu.categoryCreationModal.style.display = "none";
+        clearInput();
+    });
+}
+
+if (menu.closeCategoryCreate) {
+    menu.closeCategoryCreate.addEventListener("click", () => {
+        menu.categoryCreationModal.style.display = "none";
+        clearInput();
+    });
+}
+
+if (menu.createCategoryBtnFinal) {
+    menu.createCategoryBtnFinal.addEventListener("click", () => {
+        createCategory(menu.categoryName.value, menu.categoryIcon.value);
+        menu.categoryCreationModal.style.display = "none";
+    });
+}
+
+if (menu.deleteItemConfirm) {
+    menu.deleteItemConfirm.addEventListener("click", () => {
+        const id = menu.deleteItemConfirm.dataset.id;
         if (id) {
-            deleteItem(id)
-            elements.deleteItemModal.style.display = "none";
-            clearInput()
-            delete elements.deleteItemConfirm.dataset.id;
+            deleteItem(id);
+            menu.deleteItemModal.style.display = "none";
+            clearInput();
+            delete menu.deleteItemConfirm.dataset.id;
+        }
+    });
+}
 
-        }
-    })
-}
-if (elements.deleteCategoryConfirm) {
-    elements.deleteCategoryConfirm.addEventListener("click", () => {
-        const id = elements.deleteCategoryConfirm.dataset.id;
+if (menu.deleteCategoryConfirm) {
+    menu.deleteCategoryConfirm.addEventListener("click", () => {
+        const id = menu.deleteCategoryConfirm.dataset.id;
         if (id) {
-            deleteCategory(id)
-            elements.deleteCategoryModal.style.display = "none"
-            clearInput()
-            delete elements.deleteCategoryConfirm.dataset.id
+            deleteCategory(id);
+            menu.deleteCategoryModal.style.display = "none";
+            clearInput();
+            delete menu.deleteCategoryConfirm.dataset.id;
         }
-    })
+    });
 }
+// only attach order-item listener on detail page
+if (detail.addOrderItemBtn && detail.AddItemModal) {
+    detail.addOrderItemBtn.addEventListener("click", () => {
+        detail.AddItemModal.style.display = "flex";
+    });
+}
+
