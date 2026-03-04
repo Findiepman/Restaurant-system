@@ -230,7 +230,7 @@
 
       <div class="modal__header">
         <h2 class="modal__title" id="modal-add-item-title">Add Item to Tab</h2>
-        <button class="modal__close" type="button" aria-label="Close modal">✕</button>
+        <button id = "close-choose-item" class="modal__close" type="button" aria-label="Close modal">✕</button>
       </div>
 
       <div class="modal__body">
@@ -247,38 +247,8 @@
            List of menu items — populated from menu
            data via JS.  Selecting one highlights it.
       =========================================== -->
-        <div class="item-picker" role="listbox" aria-label="Select a menu item">
+        <div id=""class="item-picker" role="listbox" aria-label="Select a menu item">
 
-          <!-- Placeholder items (replace with JS-rendered items from menu) -->
-          <div class="item-picker-row is-selected" role="option" aria-selected="true" tabindex="0">
-            <span class="item-picker-row__name">Craft IPA Draft</span>
-            <span class="item-picker-row__price">€5.50</span>
-          </div>
-
-          <div class="item-picker-row" role="option" aria-selected="false" tabindex="0">
-            <span class="item-picker-row__name">House Red Wine (glass)</span>
-            <span class="item-picker-row__price">€7.00</span>
-          </div>
-
-          <div class="item-picker-row" role="option" aria-selected="false" tabindex="0">
-            <span class="item-picker-row__name">Cheese Board</span>
-            <span class="item-picker-row__price">€18.00</span>
-          </div>
-
-          <div class="item-picker-row" role="option" aria-selected="false" tabindex="0">
-            <span class="item-picker-row__name">Still Water (500ml)</span>
-            <span class="item-picker-row__price">€3.50</span>
-          </div>
-
-          <div class="item-picker-row" role="option" aria-selected="false" tabindex="0">
-            <span class="item-picker-row__name">Sparkling Water (500ml)</span>
-            <span class="item-picker-row__price">€3.50</span>
-          </div>
-
-          <div class="item-picker-row" role="option" aria-selected="false" tabindex="0">
-            <span class="item-picker-row__name">Espresso</span>
-            <span class="item-picker-row__price">€2.80</span>
-          </div>
 
         </div>
         <!-- /item-picker -->
@@ -296,15 +266,15 @@
 
             <div class="qty-selector" role="group" aria-label="Quantity selector">
               <!-- Decrement — JS required -->
-              <button class="qty-selector__btn" type="button" aria-label="Decrease quantity">−</button>
+              <button id="Decrease-quantity" class="qty-selector__btn" type="button" aria-label="Decrease quantity">−</button>
               <!-- Current value — updated via JS -->
-              <span class="qty-selector__value" aria-live="polite" aria-atomic="true">1</span>
+              <span id="total-queantity" class="qty-selector__value" aria-live="polite" aria-atomic="true">1</span>
               <!-- Increment — JS required -->
-              <button class="qty-selector__btn" type="button" aria-label="Increase quantity">+</button>
+              <button id="increase-quantity" class="qty-selector__btn" type="button" aria-label="Increase quantity">+</button>
             </div>
 
             <!-- Line total preview — updated via JS -->
-            <span class="text--muted" style="font-size:0.88rem;">
+            <span id="total-price" class="text--muted" style="font-size:0.88rem;">
               Total: <strong class="text--accent">€5.50</strong>
             </span>
 
@@ -320,9 +290,9 @@
       </div>
 
       <div class="modal__footer">
-        <button class="btn btn--ghost" type="button">Cancel</button>
+        <button id="cancel-add-item-modal" class="btn btn--ghost" type="button">Cancel</button>
         <!-- Confirm add — JS handles appending to order list -->
-        <button class="btn btn--primary" type="button">Add to Tab</button>
+        <button id="add-item-to-tab" class="btn btn--primary" type="button">Add to Tab</button>
       </div>
 
     </div>

@@ -61,4 +61,13 @@ export const detail = {
     closeTabSidebar: document.getElementById("close-tab-sidebar")! as HTMLButtonElement,
     AddItemModal: document.getElementById("modal-add-item")! as HTMLDivElement,
 
+
+    closeChooseItem: document.getElementById("close-choose-item")! as HTMLButtonElement,
+    lessquantityBtn: document.getElementById("Decrease-quantity")! as HTMLButtonElement,
+    morequantityBtn: document.getElementById("increase-quantity")! as HTMLButtonElement,
+    totalQuantity: document.getElementById("total-queantity")! as HTMLSpanElement,
+    totalPriceItem: document.getElementById("total-price")! as HTMLSpanElement,
+    cancelAddItemBtn: document.getElementById("cancel-add-item-modal")! as HTMLButtonElement,
+    addItemButton: document.getElementById("add-item-to-tab")! as HTMLButtonElement,
+
 }

@@ -163,4 +163,23 @@ if (detail.addOrderItemBtn && detail.AddItemModal) {
         detail.AddItemModal.style.display = "flex";
     });
 }
+detail.closeChooseItem.addEventListener("click", () => {
+    detail.AddItemModal.style.display = "none"
+})
+detail.cancelAddItemBtn.addEventListener("click", () => {
+    detail.AddItemModal.style.display = "none"
+})
+let quantity: number = 1
+detail.morequantityBtn.addEventListener("click", () => {
+    quantity++
+    detail.totalQuantity.textContent = quantity.toString()
+})
+detail.lessquantityBtn.addEventListener("click", () => {
+    quantity--
+    if (quantity <= 0) quantity = 1
+    else detail.totalQuantity.textContent = quantity.toString()
+    
+
+})
+
 
