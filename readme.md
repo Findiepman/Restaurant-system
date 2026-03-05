@@ -29,7 +29,7 @@
 └── index.html            # Main Dashboard
 ```
 ---
-## 🔧 Installation & Setup
+## Installation & Setup
 Clone the repository:
 
 # Bash
