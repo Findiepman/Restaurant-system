@@ -1,7 +1,8 @@
 import { tab, menu, detail } from "./elements.js";
 import { createCategory, createItem, deleteCategory, deleteItem, renderItems } from "./menu.js";
 import { saveMenu, getMenu, getCategories } from "./state.js";
-import { createTab, renderTabs } from "./tabs.js";
+import { createTab, renderitems, renderTabs } from "./tabs.js";
+import { renderCategoriesSidebar } from "./tabs.js";
 
 // attach tab modal buttons
 if (tab.tabModalBtn && tab.tabModal) {
@@ -161,6 +162,8 @@ if (menu.deleteCategoryConfirm) {
 if (detail.addOrderItemBtn && detail.AddItemModal) {
     detail.addOrderItemBtn.addEventListener("click", () => {
         detail.AddItemModal.style.display = "flex";
+        renderCategoriesSidebar()
+        renderitems()
     });
 }
 detail.closeChooseItem.addEventListener("click", () => {

@@ -112,6 +112,58 @@ function renderTabDetails() {
     detail.TimeOpenedSidebar.textContent = current.time
     detail.TotalItemsSidebar.textContent = current.items.toString()
 }
+export function renderCategoriesSidebar() {
+    const grid = document.getElementById("category-grid-sidebar")! as HTMLElement
+    const categories = getCategories()
+    grid.innerHTML = ""
+    const allItems = document.createElement("button")
+    allItems.className = "menu-category-link menu-category-link--active"
+    allItems.textContent = "All items"
+    grid.appendChild(allItems)
+
+    categories.forEach((category) => {
+        const card = document.createElement("button")
+        card.className = "menu-category-link"
+        card.textContent = category.name
+        card.style.color = "#e8a046"
+        card.style.backgroundColor = "#1f2535"
+        card.style.border = "1px solid #2a3047"
+        card.style.borderRadius = "8px"
+        card.addEventListener("mouseenter", () => {
+            card.style.backgroundColor = "#2a3047"
+        })
+
+        card.addEventListener("mouseleave", () => {
+            card.style.backgroundColor = "#1f2535"
+        })
+
+        grid.appendChild(card)
+    })
+
+    
+}
+
+export function renderitems() {
+    const grid = document.getElementById("items-grid-item-picker")! as HTMLDivElement
+    grid.innerHTML = ""
+    const menu = getMenu()
+
+    menu.forEach((item) => {
+        const card = document.createElement("div")
+        card.className = "item-picker-row is-selected"
+        const itemName = document.createElement("span")
+        itemName.className = "item-picker-row__name"
+        itemName.textContent = item.name
+        card.appendChild(itemName)
+        const itemPrice = document.createElement("span")
+        itemPrice.className = "item-picker-row__price"
+        itemPrice.textContent = `$${item.price}`
+        card.appendChild(itemPrice)
+
+        grid.appendChild(card)
+    })
+}
+
 
 renderTabDetails();
 renderTabs();

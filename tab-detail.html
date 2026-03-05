@@ -124,7 +124,7 @@
 
             <!-- Order items list — populated via JS -->
             <ul class="orders-list" role="list" id="order-items-list">
-              
+
 
               <!--
               PLACEHOLDER: Additional items rendered here by JavaScript.
@@ -218,81 +218,97 @@
 
 
   <!-- =====================================================
-     MODAL — ADD ORDER ITEM
-     Shown when "+ Add Item" is clicked.
-     Includes: menu item picker + quantity selector.
+     MODAL — ADD ORDER ITEM (Tab Detail)
+     Larger modal with category filter + item picker
 ====================================================== -->
   <div class="modal-overlay" id="modal-add-item" role="dialog" aria-modal="true" aria-labelledby="modal-add-item-title"
-    style="display: none">
+    style="display: none;">
 
-
-    <div class="modal">
+    <div class="modal" style="max-width: 720px; width: 100%;">
 
       <div class="modal__header">
         <h2 class="modal__title" id="modal-add-item-title">Add Item to Tab</h2>
-        <button id = "close-choose-item" class="modal__close" type="button" aria-label="Close modal">✕</button>
+        <button class="modal__close" type="button" aria-label="Close modal"
+          onclick="document.getElementById('modal-add-item').style.display='none'">✕</button>
       </div>
 
-      <div class="modal__body">
+      <div class="modal__body"
+        style="display: grid; grid-template-columns: 200px 1fr; gap: var(--space-lg); padding: var(--space-lg);">
 
-        <!-- Search within menu -->
-        <div class="search-bar">
-          <span class="search-bar__icon">🔍</span>
-          <input class="search-bar__input" type="search" placeholder="Search menu items…"
-            aria-label="Search menu items" />
-        </div>
+        <!-- =====================================================
+           LEFT — Category Selector
+      ====================================================== -->
+        <aside id="category-grid-sidebar" style="display: flex; flex-direction: column; gap: var(--space-xs);">
+          <span class="label" style="margin-bottom: var(--space-xs);">Category</span>
 
-        <!-- ==========================================
-           ITEM PICKER
-           List of menu items — populated from menu
-           data via JS.  Selecting one highlights it.
-      =========================================== -->
-        <div id=""class="item-picker" role="listbox" aria-label="Select a menu item">
+          <!-- "All" is selected by default — JS toggles active class -->
+          <button class="menu-category-link menu-category-link--active" type="button">
+            All
+            <span class="menu-category-count">12</span>
+          </button>
+
+          <!-- Populated via JS from your categories data -->
+        </aside>
+
+        <!-- =====================================================
+           RIGHT — Search + Item Picker + Quantity
+      ====================================================== -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+
+          <!-- Search -->
+          <div class="search-bar">
+            <span class="search-bar__icon">🔍</span>
+            <input class="search-bar__input" type="search" placeholder="Search items…" aria-label="Search menu items" />
+          </div>
+
+          <!-- Item list — taller to show more items -->
+          <div id="items-grid-item-picker" class="item-picker" role="listbox" aria-label="Select a menu item" style="max-height: 340px;">
+
+            <!-- Populated via JS from your menu data -->
 
 
-        </div>
-        <!-- /item-picker -->
-
-        <div class="divider"></div>
-
-        <!-- ==========================================
-           QUANTITY SELECTOR
-           UI structure only — increment/decrement
-           wired up via JS.
-      =========================================== -->
-        <div class="form-group">
-          <label class="form-label">Quantity</label>
-          <div class="flex flex--gap-md flex--center">
-
-            <div class="qty-selector" role="group" aria-label="Quantity selector">
-              <!-- Decrement — JS required -->
-              <button id="Decrease-quantity" class="qty-selector__btn" type="button" aria-label="Decrease quantity">−</button>
-              <!-- Current value — updated via JS -->
-              <span id="total-queantity" class="qty-selector__value" aria-live="polite" aria-atomic="true">1</span>
-              <!-- Increment — JS required -->
-              <button id="increase-quantity" class="qty-selector__btn" type="button" aria-label="Increase quantity">+</button>
-            </div>
-
-            <!-- Line total preview — updated via JS -->
-            <span id="total-price" class="text--muted" style="font-size:0.88rem;">
-              Total: <strong class="text--accent">€5.50</strong>
-            </span>
 
           </div>
-        </div>
 
-        <!-- Optional note for this item -->
-        <div class="form-group">
-          <label class="form-label" for="item-note">Note <span class="form-hint">(optional)</span></label>
-          <input class="form-input" id="item-note" type="text" placeholder="e.g. No ice, extra lime…" />
+          <div class="divider" style="margin: 0;"></div>
+
+          <!-- Quantity + line total -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-md);">
+
+            <div class="form-group" style="margin: 0;">
+              <span class="form-label" style="margin-bottom: var(--space-xs); display: block;">Quantity</span>
+              <div class="qty-selector" role="group" aria-label="Quantity selector">
+                <button class="qty-selector__btn" type="button" aria-label="Decrease quantity">−</button>
+                <span class="qty-selector__value" aria-live="polite">1</span>
+                <button class="qty-selector__btn" type="button" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+
+            <!-- Line total — updated via JS -->
+            <div style="text-align: right;">
+              <span class="label">Line Total</span>
+              <div style="font-family: var(--font-mono); font-size: 1.4rem; color: var(--color-accent);">€5.50</div>
+            </div>
+
+          </div>
+
+          <!-- Optional note -->
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" for="item-note">Note <span class="form-hint">(optional)</span></label>
+            <input class="form-input" id="item-note" type="text" placeholder="e.g. No ice, extra lime…" />
+          </div>
+
         </div>
+        <!-- /right column -->
 
       </div>
 
       <div class="modal__footer">
-        <button id="cancel-add-item-modal" class="btn btn--ghost" type="button">Cancel</button>
-        <!-- Confirm add — JS handles appending to order list -->
-        <button id="add-item-to-tab" class="btn btn--primary" type="button">Add to Tab</button>
+        <button class="btn btn--ghost" type="button"
+          onclick="document.getElementById('modal-add-item').style.display='none'">
+          Cancel
+        </button>
+        <button class="btn btn--primary" type="button">Add to Tab</button>
       </div>
 
     </div>
