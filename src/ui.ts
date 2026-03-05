@@ -59,6 +59,7 @@ function clearInput() {
 if (menu.createItemBtn) {
     menu.createItemBtn.addEventListener("click", () => {
         menu.createItemModal.style.display = "flex";
+
         const selectElement = menu.itemCategory;
 
         // empty select then populate categories
@@ -70,6 +71,7 @@ if (menu.createItemBtn) {
             categoryItem.textContent = `${category.icon} | ${category.name}`;
             selectElement.appendChild(categoryItem);
         });
+        renderCategoriesSidebar()
     });
 }
 
@@ -161,6 +163,8 @@ if (menu.deleteCategoryConfirm) {
 // only attach order-item listener on detail page
 if (detail.addOrderItemBtn && detail.AddItemModal) {
     detail.addOrderItemBtn.addEventListener("click", () => {
+        quantity = 1;
+        detail.totalQuantity.textContent = quantity.toString();
         detail.AddItemModal.style.display = "flex";
         renderCategoriesSidebar()
         renderitems()
@@ -184,6 +188,13 @@ if (detail.morequantityBtn) {
         detail.totalQuantity.textContent = quantity.toString()
     })
 }
+detail.AddtoTabFinal.addEventListener("click", () => {
+    quantity = 1
+    detail.totalQuantity.textContent = quantity.toString()
+})
+if (detail.closeChooseItem) detail.closeChooseItem.addEventListener("click", () => { quantity = 1; detail.totalQuantity.textContent = quantity.toString(); console.log("wefhj") })
+if (detail.cancelAddItemBtn) detail.cancelAddItemBtn.addEventListener("click", () => { quantity = 1; detail.totalQuantity.textContent = quantity.toString() })
+
 
 if (detail.lessquantityBtn) {
     detail.lessquantityBtn.addEventListener("click", () => {

@@ -21,6 +21,12 @@ export function createTab(name: string, tableNumber: number) {
         renderTabs()
     }
 }
+export function deleteTab(id: string) {
+    const tab = getTabs()
+    const updatedTabs = tab.filter(tab => tab.id !== id);
+    saveTabs(updatedTabs);
+    renderTabs();
+}
 
 export function renderTabs() {
     const grid = document.querySelector("#tabs-grid-67") as HTMLDivElement | null
@@ -35,6 +41,8 @@ export function renderTabs() {
     const tabs = getTabs()
 
     tabs.forEach((tab) => {
+
+        
 
         const card = document.createElement("article")
         card.className = "tab-card"
@@ -63,7 +71,7 @@ export function renderTabs() {
         items.textContent = `Total items: ${tab.items.length.toString()}`
         const price = document.createElement("span")
         price.className = "tab-card__total"
-        price.textContent = "Total $WIP"
+        price.textContent = `Total $${tab.total}`
         meta.appendChild(items)
         meta.appendChild(price)
 
@@ -83,7 +91,13 @@ export function renderTabs() {
         actions.appendChild(deletebtn)
 
 
-        card.addEventListener("click", () => openTabDetail(tab.id))
+        
+        card.addEventListener("click", (e) => {
+            if (e.ctrlKey) {
+                deleteTab(tab.id)
+            }
+            else {openTabDetail(tab.id)}
+        })
 
         header.appendChild(table)
         card.appendChild(customer)
@@ -117,7 +131,12 @@ function renderTabDetails() {
     detail.tableNumSidebar.textContent = current.tableNumber.toString()
     detail.customerNamesidebar.textContent = current.name
     detail.TimeOpenedSidebar.textContent = current.time
-    detail.TotalItemsSidebar.textContent = current.items.toString()
+    detail.TotalItemsSidebar.textContent = current.items.length.toString()
+
+    detail.totalExclusiefVat.textContent = current.total.toString()
+    detail.totalPriceTab.textContent = (current.total + 9.77).toFixed(2)
+
+    renderOrderedItems()
 }
 
 
@@ -218,7 +237,8 @@ export function renderitems(categoryFilter: string = "all") {
             if (selectedName) {
                 const q = parseInt(detail.totalQuantity.textContent || "1", 10) || 1;
                 addItem(selectedName, q);
-                // optionally close modal or re-render
+                detail.AddItemModal.style.display = "none"
+                renderOrderedItems()
                 renderitems(categoryFilter);
             }
         };
@@ -250,10 +270,56 @@ export function addItem(name: string, quantity: number) {
             price: menuItem.price,
             quantity: quantity
         }
+        currentTab.total += menuItem.price
+        console.log(currentTab.total)
         currentTab.items.push(orderItem);
-        saveTabs(tabs);
+        saveTabs(tabs); 
         isSelected = false
+        detail.totalQuantity.textContent = "1"
     }
+}
+export function renderOrderedItems() {
+    const grid = detail.orderItemsList
+    grid.innerHTML = ""
+
+    const currentTabId = new URLSearchParams(window.location.search).get("id");
+    const tabs = getTabs();
+    const currentTab = tabs.find(tab => tab.id === currentTabId);
+
+    if (!currentTab) return;
+
+    currentTab.items.forEach((item) => {
+        const card = document.createElement("li")
+        card.className ="order-item"
+        const quantity = document.createElement("span")
+        quantity.className = "order-item__qty"
+        quantity.textContent = item.quantity.toString()
+        card.appendChild(quantity)
+
+        const info = document.createElement("div")
+        info.className = "order-item__info"
+        card.appendChild(info)
+
+        const name = document.createElement("div")
+        name.className = "order-item__name"
+        name.textContent = item.name
+        info.appendChild(name)
+
+        const note = document.createElement("div")
+        note.className = "order-item__note"
+        info.appendChild(note)
+
+        const price = document.createElement("span")
+        price.className = "order-item__price"
+        price.textContent = `$${item.price}`
+        card.appendChild(price)
+
+        const remove = document.createElement("button")
+        remove.className = "order-item__remove"
+        remove.textContent = `Remove ${item.name}`
+        grid.appendChild(card)
+    })
+    
 }
 
 renderTabDetails();
