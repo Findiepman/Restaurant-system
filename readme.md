@@ -26,26 +26,28 @@
 │   ├── tab-detail.ts     # Table-specific ordering logic
 │   └── ui.ts             # Global UI interactions
 ├── dist/                 # Compiled JavaScript
-└── index.html            # Main Dashboard```
-🔧 Installation & Setup
+└── index.html            # Main Dashboard
+```
+
+## 🔧 Installation & Setup
 Clone the repository:
 
-Bash
+# Bash
 git clone [https://github.com/yourusername/restoflow-pos.git](https://github.com/yourusername/restoflow-pos.git)
 Install dependencies:
 
-Bash
+# Bash
 npm install
 Compile TypeScript:
 
-Bash
+# Bash
 npx tsc -w
 Launch: Open index.html via Live Server.
 
-📖 How it Works
+## 📖 How it Works
 The app uses URL Search Parameters to pass data between the main dashboard and the tab details.
 
 When a waiter clicks on a table, the openTabDetail(id) function triggers a redirect to tab-detail.html?id=..., where the system automatically populates the page with that specific table's data.
 
-⚖️ License
+## ⚖️ License
 Distributed under the MIT License. See LICENSE for more information.
