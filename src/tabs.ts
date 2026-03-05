@@ -25,10 +25,16 @@ export function renderTabs() {
     const grid = document.querySelector("#tabs-grid-67") as HTMLDivElement | null
     if (!grid) return; // Exit if element doesn't exist on this page
     grid.innerHTML = ""; // clear existing cards before rendering
+    let totaltabs = getTabs().length
+    const totaltabstext = document.getElementById("total-tabs-open")! as HTMLSpanElement
+    console.log(totaltabs)
+    totaltabstext.textContent = totaltabs.toString()
+    document.getElementById("total-tabs-dashboard")!.textContent = totaltabs.toString()
 
     const tabs = getTabs()
 
     tabs.forEach((tab) => {
+
         const card = document.createElement("article")
         card.className = "tab-card"
         const header = document.createElement("div")
@@ -140,7 +146,7 @@ export function renderCategoriesSidebar() {
         grid.appendChild(card)
     })
 
-    
+
 }
 
 export function renderitems() {
