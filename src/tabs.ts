@@ -1,5 +1,6 @@
 import { tab, detail } from "./elements.js";
 import { saveTabs, getTabs, getMenu, getCategories } from "./state.js";
+import { isCategoryEmpty } from "./menu.js";
 
 
 export function createTab(name: string, tableNumber: number) {
@@ -118,14 +119,19 @@ function renderTabDetails() {
     detail.TimeOpenedSidebar.textContent = current.time
     detail.TotalItemsSidebar.textContent = current.items.toString()
 }
+
+
 export function renderCategoriesSidebar() {
     const grid = document.getElementById("category-grid-sidebar")! as HTMLElement
-    const categories = getCategories()
+    let categories = getCategories()
     grid.innerHTML = ""
     const allItems = document.createElement("button")
     allItems.className = "menu-category-link menu-category-link--active"
     allItems.textContent = "All items"
     grid.appendChild(allItems)
+    allItems.addEventListener("click", () => { renderitems("all") })
+
+
 
     categories.forEach((category) => {
         const card = document.createElement("button")
@@ -142,6 +148,9 @@ export function renderCategoriesSidebar() {
         card.addEventListener("mouseleave", () => {
             card.style.backgroundColor = "#1f2535"
         })
+        card.addEventListener("click", () => {
+            renderitems(category.name)
+        })
 
         grid.appendChild(card)
     })
@@ -149,27 +158,103 @@ export function renderCategoriesSidebar() {
 
 }
 
-export function renderitems() {
-    const grid = document.getElementById("items-grid-item-picker")! as HTMLDivElement
-    grid.innerHTML = ""
-    const menu = getMenu()
+export function renderitems(categoryFilter: string = "all") {
+    const grid = document.getElementById("items-grid-item-picker") as HTMLDivElement | null;
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    let menu = getMenu();
+    if (categoryFilter !== "all") {
+        menu = menu.filter(item => item.category === categoryFilter);
+        if (isCategoryEmpty(categoryFilter)) {
+            const card = document.createElement("div");
+            card.className = "menu-item-card";
+            const cardBody = document.createElement("div");
+            cardBody.className = "menu-item-card__body";
+            const text = document.createElement("h3");
+            text.textContent = "No items yet..";
+            text.className = "menu-item-card__name";
+            const cardDesc = document.createElement("p");
+            cardDesc.className = "menu-item-card__desc";
+            cardDesc.textContent = "This category has no items. Add one in the menu page.";
+
+            cardBody.appendChild(text);
+            cardBody.appendChild(cardDesc);
+            card.appendChild(cardBody);
+            grid.appendChild(card);
+        }
+    }
+
+    let selectedName: string | null = null;
 
     menu.forEach((item) => {
-        const card = document.createElement("div")
-        card.className = "item-picker-row is-selected"
-        const itemName = document.createElement("span")
-        itemName.className = "item-picker-row__name"
-        itemName.textContent = item.name
-        card.appendChild(itemName)
-        const itemPrice = document.createElement("span")
-        itemPrice.className = "item-picker-row__price"
-        itemPrice.textContent = `$${item.price}`
-        card.appendChild(itemPrice)
+        const card = document.createElement("div");
+        card.className = "item-picker-row";
+        const itemName = document.createElement("span");
+        itemName.className = "item-picker-row__name";
+        itemName.textContent = item.name;
+        card.appendChild(itemName);
+        const itemPrice = document.createElement("span");
+        itemPrice.className = "item-picker-row__price";
+        itemPrice.textContent = `$${item.price}`;
+        card.appendChild(itemPrice);
 
-        grid.appendChild(card)
-    })
+        card.addEventListener("click", () => {
+            const prev = grid.querySelector(".item-picker-row.selected");
+            if (prev) {
+                prev.classList.remove("selected");
+                (prev as HTMLElement).style.border = "";
+            }
+            card.classList.add("selected");
+            card.style.border = "2px solid white";
+            selectedName = item.name;
+        });
+
+        grid.appendChild(card);
+    });
+
+    if (detail.AddtoTabFinal) {
+        detail.AddtoTabFinal.onclick = () => {
+            if (selectedName) {
+                const q = parseInt(detail.totalQuantity.textContent || "1", 10) || 1;
+                addItem(selectedName, q);
+                // optionally close modal or re-render
+                renderitems(categoryFilter);
+            }
+        };
+    }
 }
 
+
+
+
+let isSelected
+
+
+
+export function addItem(name: string, quantity: number) {
+    // Get current tab id from URL
+    const currentTabId = new URLSearchParams(window.location.search).get("id");
+    const tabs = getTabs();
+    const currentTab = tabs.find(tab => tab.id === currentTabId);
+
+    if (!currentTab) return;
+
+    // Find the menu item
+    const menu = getMenu();
+    const menuItem = menu.find(item => item.name === name);
+
+    if (menuItem && quantity > 0) {
+        const orderItem = {
+            name: menuItem.name,
+            price: menuItem.price,
+            quantity: quantity
+        }
+        currentTab.items.push(orderItem);
+        saveTabs(tabs);
+        isSelected = false
+    }
+}
 
 renderTabDetails();
 renderTabs();

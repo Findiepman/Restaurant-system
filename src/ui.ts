@@ -166,23 +166,31 @@ if (detail.addOrderItemBtn && detail.AddItemModal) {
         renderitems()
     });
 }
-detail.closeChooseItem.addEventListener("click", () => {
-    detail.AddItemModal.style.display = "none"
-})
-detail.cancelAddItemBtn.addEventListener("click", () => {
-    detail.AddItemModal.style.display = "none"
-})
+if (detail.closeChooseItem) {
+    detail.closeChooseItem.addEventListener("click", () => {
+        detail.AddItemModal.style.display = "none"
+    })
+}
+if (detail.cancelAddItemBtn) {
+    detail.cancelAddItemBtn.addEventListener("click", () => {
+        detail.AddItemModal.style.display = "none"
+    })
+}
 let quantity: number = 1
-detail.morequantityBtn.addEventListener("click", () => {
-    quantity++
-    detail.totalQuantity.textContent = quantity.toString()
-})
-detail.lessquantityBtn.addEventListener("click", () => {
-    quantity--
-    if (quantity <= 0) quantity = 1
-    else detail.totalQuantity.textContent = quantity.toString()
-    
+console.log(quantity)
+if (detail.morequantityBtn) {
+    detail.morequantityBtn.addEventListener("click", () => {
+        quantity++
+        detail.totalQuantity.textContent = quantity.toString()
+    })
+}
 
-})
+if (detail.lessquantityBtn) {
+    detail.lessquantityBtn.addEventListener("click", () => {
+        quantity--
+        if (quantity <= 0) quantity = 1
+        detail.totalQuantity.textContent = quantity.toString()
+    })
+}
 
 

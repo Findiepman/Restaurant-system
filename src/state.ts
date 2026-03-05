@@ -6,13 +6,18 @@ export interface MenuItem {
     category: string;
     desc: string;
 }
+export interface orderItem {
+    name: string,
+    quantity: number,
+    price: number
+}
 
 export interface Tab {
     id: string;
     tableNumber: number;
     total: number
     name: string,
-    items: MenuItem[];
+    items: orderItem[];
     isOpen: boolean;
     time: string
 }
@@ -45,5 +50,5 @@ export const getMenu = (): MenuItem[] => {
 }
 export const getCategories = (): Category[] => {
     const data = localStorage.getItem('categories')
-    return data ?  JSON.parse(data) : [];
+    return data ? JSON.parse(data) : [];
 }

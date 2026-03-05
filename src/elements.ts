@@ -63,11 +63,12 @@ export const detail = {
 
 
     closeChooseItem: document.getElementById("close-choose-item")! as HTMLButtonElement,
-    lessquantityBtn: document.getElementById("Decrease-quantity")! as HTMLButtonElement,
-    morequantityBtn: document.getElementById("increase-quantity")! as HTMLButtonElement,
-    totalQuantity: document.getElementById("total-queantity")! as HTMLSpanElement,
+    lessquantityBtn: document.getElementById("less-quantiy-items")! as HTMLButtonElement,
+    morequantityBtn: document.getElementById("more-quantiy-items")! as HTMLButtonElement,
+    totalQuantity: document.getElementById("quantiy-shower")! as HTMLSpanElement,
     totalPriceItem: document.getElementById("total-price")! as HTMLSpanElement,
     cancelAddItemBtn: document.getElementById("cancel-add-item-modal")! as HTMLButtonElement,
     addItemButton: document.getElementById("add-item-to-tab")! as HTMLButtonElement,
+    AddtoTabFinal: document.getElementById("finish-adding-to-tab-btn")! as HTMLButtonElement,
 
 }

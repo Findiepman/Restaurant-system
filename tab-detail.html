@@ -278,9 +278,9 @@
             <div class="form-group" style="margin: 0;">
               <span class="form-label" style="margin-bottom: var(--space-xs); display: block;">Quantity</span>
               <div class="qty-selector" role="group" aria-label="Quantity selector">
-                <button class="qty-selector__btn" type="button" aria-label="Decrease quantity">−</button>
-                <span class="qty-selector__value" aria-live="polite">1</span>
-                <button class="qty-selector__btn" type="button" aria-label="Increase quantity">+</button>
+                <button id="less-quantiy-items" class="qty-selector__btn" type="button" aria-label="Decrease quantity">−</button>
+                <span id="quantiy-shower" class="qty-selector__value" aria-live="polite">1</span>
+                <button id="more-quantiy-items" class="qty-selector__btn" type="button" aria-label="Increase quantity">+</button>
               </div>
             </div>
 
@@ -308,7 +308,7 @@
           onclick="document.getElementById('modal-add-item').style.display='none'">
           Cancel
         </button>
-        <button class="btn btn--primary" type="button">Add to Tab</button>
+        <button id="finish-adding-to-tab-btn" class="btn btn--primary" type="button">Add to Tab</button>
       </div>
 
     </div>

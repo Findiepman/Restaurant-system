@@ -91,7 +91,7 @@ export function renderCategories() {
         grid.appendChild(li)
     })
 }
-function isCategoryEmpty(categoryId: string): boolean {
+export function isCategoryEmpty(categoryId: string): boolean {
     const menu = getMenu();
 
     // Check of er MINSTENS één item is met deze categoryId
