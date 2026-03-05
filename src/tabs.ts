@@ -2,7 +2,6 @@ import { tab, detail } from "./elements.js";
 import { saveTabs, getTabs, getMenu, getCategories } from "./state.js";
 import { isCategoryEmpty } from "./menu.js";
 
-
 export function createTab(name: string, tableNumber: number) {
     const tabs = getTabs()
     const existingTab = getTabs().some(tab => tab.name.toLocaleLowerCase().trim() === name.toLocaleLowerCase().trim())
@@ -28,6 +27,16 @@ export function deleteTab(id: string) {
     renderTabs();
 }
 
+export function getTabStats() {
+    const tabs = getTabs();
+    const count = tabs.length;
+    const totalRevenue = tabs.reduce((sum, tab) => sum + tab.total, 0);
+    const averageRevenue = count > 0 ? totalRevenue / count : 0;
+    return { count, totalRevenue, averageRevenue };
+}
+
+let totalrevenue: number = 0;
+let averageRevenue: number = 0
 export function renderTabs() {
     const grid = document.querySelector("#tabs-grid-67") as HTMLDivElement | null
     if (!grid) return; // Exit if element doesn't exist on this page
@@ -37,12 +46,18 @@ export function renderTabs() {
     console.log(totaltabs)
     totaltabstext.textContent = totaltabs.toString()
     document.getElementById("total-tabs-dashboard")!.textContent = totaltabs.toString()
+    const revenueDisplay = document.getElementById("total-revenue")!
+    const averageRevenueDisplay = document.getElementById("average-revenue")!
+
 
     const tabs = getTabs()
 
+    // Reset totalrevenue before calculating
+    totalrevenue = 0;
+
     tabs.forEach((tab) => {
 
-        
+        totalrevenue += tab.total
 
         const card = document.createElement("article")
         card.className = "tab-card"
@@ -91,12 +106,12 @@ export function renderTabs() {
         actions.appendChild(deletebtn)
 
 
-        
+
         card.addEventListener("click", (e) => {
             if (e.ctrlKey) {
                 deleteTab(tab.id)
             }
-            else {openTabDetail(tab.id)}
+            else { openTabDetail(tab.id) }
         })
 
         header.appendChild(table)
@@ -106,7 +121,15 @@ export function renderTabs() {
         card.appendChild(actions)
         card.appendChild(header)
         grid.appendChild(card)
+        console.log(totalrevenue)
     })
+
+    // Calculate average after summing all totals
+    averageRevenue = totaltabs > 0 ? totalrevenue / totaltabs : 0;
+
+    // Update displays after the loop
+    revenueDisplay.textContent = `$${totalrevenue.toString()}`
+    averageRevenueDisplay.textContent = `$${averageRevenue.toFixed(2)}`
 }
 
 function openTabDetail(id: string) {
@@ -125,7 +148,7 @@ function renderTabDetails() {
 
     detail.topDetails.textContent = `Table ${current.tableNumber} -- ${current.name}`;
     detail.tableNumBig.textContent = `Table ${current.tableNumber}`;
-    detail.CustomerSectionTime.textContent = `${current.name} · WIP · Opened WIP`;
+    detail.CustomerSectionTime.textContent = `${current.name} · WIP · opened ${current.time}`;
     detail.ActivityTab.textContent = current.isOpen ? "Active" : "Inactive";
 
     detail.tableNumSidebar.textContent = current.tableNumber.toString()
@@ -135,6 +158,9 @@ function renderTabDetails() {
 
     detail.totalExclusiefVat.textContent = current.total.toString()
     detail.totalPriceTab.textContent = (current.total + 9.77).toFixed(2)
+    if (current.items.length == 0) {
+        detail.totalPriceTab.textContent = "0.00"
+    }
 
     renderOrderedItems()
 }
@@ -236,6 +262,8 @@ export function renderitems(categoryFilter: string = "all") {
         detail.AddtoTabFinal.onclick = () => {
             if (selectedName) {
                 const q = parseInt(detail.totalQuantity.textContent || "1", 10) || 1;
+                quantity = 1
+                detail.totalQuantity.textContent = quantity.toString()
                 addItem(selectedName, q);
                 detail.AddItemModal.style.display = "none"
                 renderOrderedItems()
@@ -243,6 +271,35 @@ export function renderitems(categoryFilter: string = "all") {
             }
         };
     }
+}
+let quantity: number = 1
+console.log(quantity)
+if (detail.morequantityBtn) {
+    detail.morequantityBtn.addEventListener("click", () => {
+        quantity++
+        detail.totalQuantity.textContent = quantity.toString()
+    })
+}
+
+if (detail.closeChooseItem) detail.closeChooseItem.addEventListener("click", () => { quantity = 1; detail.totalQuantity.textContent = quantity.toString(); console.log("wefhj") })
+if (detail.cancelAddItemBtn) detail.cancelAddItemBtn.addEventListener("click", () => { quantity = 1; detail.totalQuantity.textContent = quantity.toString() })
+
+
+if (detail.lessquantityBtn) {
+    detail.lessquantityBtn.addEventListener("click", () => {
+        quantity--
+        if (quantity <= 0) quantity = 1
+        detail.totalQuantity.textContent = quantity.toString()
+    })
+}
+if (detail.addOrderItemBtn && detail.AddItemModal) {
+    detail.addOrderItemBtn.addEventListener("click", () => {
+        quantity = 1;
+        detail.totalQuantity.textContent = quantity.toString();
+        detail.AddItemModal.style.display = "flex";
+        renderCategoriesSidebar()
+        renderitems()
+    });
 }
 
 
@@ -267,17 +324,45 @@ export function addItem(name: string, quantity: number) {
     if (menuItem && quantity > 0) {
         const orderItem = {
             name: menuItem.name,
-            price: menuItem.price,
+            price: menuItem.price * quantity,
             quantity: quantity
         }
-        currentTab.total += menuItem.price
-        console.log(currentTab.total)
+        // add full cost (price times quantity)
+        currentTab.total += menuItem.price * quantity;
+        console.log(currentTab.total);
         currentTab.items.push(orderItem);
-        saveTabs(tabs); 
+        saveTabs(tabs);
         isSelected = false
         detail.totalQuantity.textContent = "1"
+        renderOrderedItems()
+        renderTabDetails()
     }
+
 }
+
+export function removeItem(index: number) {
+    // remove an item by its index from the current tab
+    const currentTabId = new URLSearchParams(window.location.search).get("id");
+    const tabs = getTabs();
+    const currentTab = tabs.find(tab => tab.id === currentTabId);
+
+    if (!currentTab) return;
+
+    // make sure index is valid
+    if (index < 0 || index >= currentTab.items.length) return;
+
+    const removed = currentTab.items[index];
+    // adjust total (price already accounts for quantity)
+    currentTab.total = Math.max(0, currentTab.total - removed.price);
+    // remove the item
+    currentTab.items.splice(index, 1);
+
+    saveTabs(tabs);
+    // re-render details so UI reflects change (both item list and sidebar totals)
+    renderOrderedItems();
+    renderTabDetails();
+}
+
 export function renderOrderedItems() {
     const grid = detail.orderItemsList
     grid.innerHTML = ""
@@ -290,7 +375,7 @@ export function renderOrderedItems() {
 
     currentTab.items.forEach((item) => {
         const card = document.createElement("li")
-        card.className ="order-item"
+        card.className = "order-item"
         const quantity = document.createElement("span")
         quantity.className = "order-item__qty"
         quantity.textContent = item.quantity.toString()
@@ -317,9 +402,23 @@ export function renderOrderedItems() {
         const remove = document.createElement("button")
         remove.className = "order-item__remove"
         remove.textContent = `Remove ${item.name}`
+        // wire up removal using current index
+        remove.addEventListener("click", (e) => {
+            const idx = currentTab.items.indexOf(item);
+            if (idx !== -1) {
+                removeItem(idx);
+            }
+        });
+        card.addEventListener("click", (e) => {
+            if (e.ctrlKey) {
+                const idx = currentTab.items.indexOf(item);
+                removeItem(idx)
+            }
+        })
+        card.appendChild(remove);
         grid.appendChild(card)
     })
-    
+
 }
 
 renderTabDetails();

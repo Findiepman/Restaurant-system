@@ -161,15 +161,7 @@ if (menu.deleteCategoryConfirm) {
     });
 }
 // only attach order-item listener on detail page
-if (detail.addOrderItemBtn && detail.AddItemModal) {
-    detail.addOrderItemBtn.addEventListener("click", () => {
-        quantity = 1;
-        detail.totalQuantity.textContent = quantity.toString();
-        detail.AddItemModal.style.display = "flex";
-        renderCategoriesSidebar()
-        renderitems()
-    });
-}
+
 if (detail.closeChooseItem) {
     detail.closeChooseItem.addEventListener("click", () => {
         detail.AddItemModal.style.display = "none"
@@ -180,28 +172,6 @@ if (detail.cancelAddItemBtn) {
         detail.AddItemModal.style.display = "none"
     })
 }
-let quantity: number = 1
-console.log(quantity)
-if (detail.morequantityBtn) {
-    detail.morequantityBtn.addEventListener("click", () => {
-        quantity++
-        detail.totalQuantity.textContent = quantity.toString()
-    })
-}
-detail.AddtoTabFinal.addEventListener("click", () => {
-    quantity = 1
-    detail.totalQuantity.textContent = quantity.toString()
-})
-if (detail.closeChooseItem) detail.closeChooseItem.addEventListener("click", () => { quantity = 1; detail.totalQuantity.textContent = quantity.toString(); console.log("wefhj") })
-if (detail.cancelAddItemBtn) detail.cancelAddItemBtn.addEventListener("click", () => { quantity = 1; detail.totalQuantity.textContent = quantity.toString() })
 
-
-if (detail.lessquantityBtn) {
-    detail.lessquantityBtn.addEventListener("click", () => {
-        quantity--
-        if (quantity <= 0) quantity = 1
-        detail.totalQuantity.textContent = quantity.toString()
-    })
-}
 
 
