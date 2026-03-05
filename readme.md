@@ -1,4 +1,4 @@
-## 🚀 Features
+## Features
 
 * **Dynamic Menu Builder:** Create, edit, and delete menu items with custom descriptions (e.g., volume, alcohol content, or ingredients).
 * **Smart Filtering:** Quickly navigate through categories (Drinks, Food, Specials) to find items during busy shifts.
@@ -8,7 +8,7 @@
 
 ---
 
-## 🛠️ Technical Stack
+## Technical Stack
 
 * **Language:** [TypeScript](https://www.typescriptlang.org/) (Strictly typed interfaces)
 * **Frontend:** HTML5, CSS3 (Modern Grid & Flexbox)
@@ -17,7 +17,7 @@
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 ├── src/
@@ -46,12 +46,12 @@ Launch: Open index.html via Live Server.
 
 ---
 
-## 📖 How it Works
+## How it Works
 The app uses URL Search Parameters to pass data between the main dashboard and the tab details.
 
 When a waiter clicks on a table, the openTabDetail(id) function triggers a redirect to tab-detail.html?id=..., where the system automatically populates the page with that specific table's data.
 
 ---
 
-## ⚖️ License
+## License
 Distributed under the MIT License. See LICENSE for more information.
