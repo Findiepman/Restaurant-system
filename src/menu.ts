@@ -1,45 +1,81 @@
-import { getCategories, getMenu, saveCategory, saveMenu } from "./state.js";
+import { Category, getCategories, getMenu, MenuItem, saveCategory, saveMenu } from "./state.js";
 import { menu } from "./elements.js";
+import { dbMenu, dbTabs } from "./db.js";
+import { dbCategories } from "./db.js";
+import { renderitems } from "./tabs.js";
 
 let totalItems = 0
-export function createItem(name: string, price: number, category: string, desc: string) {
-    const existingItem = getMenu().some(item => item.name.toLocaleLowerCase().trim() === name.toLocaleLowerCase().trim())
-    const currentMenu = getMenu();
+export async function createItem(name: string, price: number, category: string, desc: string) {
+    const allItems = await dbMenu.allDocs({ include_docs: true });
+
+    const existingItem = allItems.rows.some(row => {
+        const doc = row.doc as unknown as MenuItem;
+        return doc?.name?.toLowerCase().trim() === name.toLocaleLowerCase().trim()
+    })
+
     if (!existingItem && name && price) {
+        const itemId = crypto.randomUUID().toString()
+
         const newItem = {
             name: name,
-            id: crypto.randomUUID(),
+            id: itemId,
+            _id: itemId,
             price: price,
             category: category,
             desc: desc,
+        } as any
+
+        try {
+            await dbMenu.put(newItem)
+            console.log("Succesfully saved item to menu")
+
+            await renderItems()
+        } catch (err) {
+            console.error("Error", err)
         }
-        currentMenu.push(newItem);
-        totalItems += 1
-        saveMenu(currentMenu);
-        renderItems()
+
+
+        
     }
 }
-export function createCategory(name: string, icon: string) {
-    const currentCategory = getCategories()
-    const existingCategory = getCategories().some(category => category.name.toLocaleLowerCase().trim() === name.toLocaleLowerCase().trim())
+export async function createCategory(name: string, icon: string) {
+    const allCategories = await dbCategories.allDocs({ include_docs: true });
+    const existingCategory = allCategories.rows.some(row => {
+        const doc = row.doc as unknown as Category
+        return doc?.name?.toLocaleLowerCase().trim() === name.toLocaleLowerCase().trim();
+    })
+    
     if (!existingCategory && name && icon) {
+        const newTabId = crypto.randomUUID().toString()
+        
+
         const category = {
             name: name,
-            id: crypto.randomUUID(),
+            id: newTabId,
+            _id: newTabId,
             icon: icon
+        } as any;
+
+        try {
+            await dbCategories.put(category)
+            console.log("Succesfully saved " + category + " to DB!")
+
+            await renderCategories()
+        } catch (err) {
+            console.error("Database save failed", err)
         }
-        currentCategory.push(category)
-        console.log(category)
-        saveCategory(currentCategory)
-        renderCategories()
+
     }
 }
-export function renderCategories() {
+export async function renderCategories() {
     const grid = menu.categoryGrid
     if (!grid) return; // Exit if element doesn't exist on this page
     grid.innerHTML = ""
 
-    const currentCategory = getCategories()
+    const result = await dbCategories.allDocs({include_docs: true})
+    const allCategories = result.rows.map(row => row.doc as any)
+
+
     const allItems = document.createElement("button")
     allItems.className = "menu-category-link menu-category-link--active"
     allItems.style.width = "100%"
@@ -53,7 +89,7 @@ export function renderCategories() {
     })
 
 
-    currentCategory.forEach((category) => {
+    allCategories.forEach((category) => {
         const li = document.createElement("li")
         const button = document.createElement("button")
         button.style.width = "100%"
@@ -100,100 +136,129 @@ export function isCategoryEmpty(categoryId: string): boolean {
     // Als hasItems 'false' is, dan is de categorie leeg
     return !hasItems;
 }
-export function renderItems(categoryFilter: string = "all") {
-    const grid = menu.itemGrid
-    if (!grid) return; // Exit if element doesn't exist on this page
-    let currentMenu = getMenu();
-    grid.innerHTML = ""
+// 1. Added 'async' here
+export async function renderItems(categoryFilter: string = "all") {
+    const grid = menu.itemGrid;
+    if (!grid) return; 
 
+    grid.innerHTML = "";
+
+    // 2. Fetch all menu items from PouchDB
+    const result = await dbMenu.allDocs({ include_docs: true });
+    let currentMenu = result.rows.map(row => row.doc as any);
+
+    // 3. Handle Filtering
     if (categoryFilter !== "all") {
-        currentMenu = currentMenu.filter(item => item.category === categoryFilter)
-        if (isCategoryEmpty(categoryFilter) == true) {
-            const card = document.createElement("div")
-            card.className = "menu-item-card"
-            const cardBody = document.createElement("div")
-            cardBody.className = "menu-item-card__body"
-            const text = document.createElement("h3")
-            text.textContent = "No items yet.."
-            text.className = "menu-item-card__name"
-            const cardDesc = document.createElement("p")
-            cardDesc.className = "menu-item-card__desc"
-            cardDesc.textContent = "This category has no items. Add one using the button above."
-
-            cardBody.appendChild(text)
-            cardBody.appendChild(cardDesc)
-            card.appendChild(cardBody)
-            grid.appendChild(card)
-        }
+        currentMenu = currentMenu.filter(item => item.category === categoryFilter);
     }
 
+    // 4. Handle Empty State
+    if (currentMenu.length === 0) {
+        const card = document.createElement("div");
+        card.className = "menu-item-card";
+        const cardBody = document.createElement("div");
+        cardBody.className = "menu-item-card__body";
+        const text = document.createElement("h3");
+        text.textContent = categoryFilter === "all" ? "No items in menu yet.." : "No items yet..";
+        text.className = "menu-item-card__name";
+        const cardDesc = document.createElement("p");
+        cardDesc.className = "menu-item-card__desc";
+        cardDesc.textContent = "Add your first item using the button above.";
+
+        cardBody.appendChild(text);
+        cardBody.appendChild(cardDesc);
+        card.appendChild(cardBody);
+        grid.appendChild(card);
+        return; // Exit early since there is nothing else to render
+    }
+
+    // 5. Render Items
     currentMenu.forEach((item) => {
-        const card = document.createElement("article")
-        card.className = "menu-item-card"
-        const itemBody = document.createElement("div")
-        itemBody.className = "menu-item-card__body"
-        const category = document.createElement("span")
-        category.textContent = item.category
-        category.className = "menu-item-card__category"
-        const itemName = document.createElement("h3")
-        itemName.textContent = item.name
-        itemName.className = "menu-item-card__name"
-        const itemDesc = document.createElement("p")
-        itemDesc.textContent = `${item.desc}`
-        itemDesc.className = "menu-item-card__desc"
-        itemBody.appendChild(category)
-        itemBody.appendChild(itemName)
-        itemBody.appendChild(itemDesc)
+        const card = document.createElement("article");
+        card.className = "menu-item-card";
+        
+        const itemBody = document.createElement("div");
+        itemBody.className = "menu-item-card__body";
+        
+        const category = document.createElement("span");
+        category.textContent = item.category;
+        category.className = "menu-item-card__category";
+        
+        const itemName = document.createElement("h3");
+        itemName.textContent = item.name;
+        itemName.className = "menu-item-card__name";
+        
+        const itemDesc = document.createElement("p");
+        itemDesc.textContent = item.desc || "";
+        itemDesc.className = "menu-item-card__desc";
 
-        const itemFooter = document.createElement("div")
-        itemFooter.className = "menu-item-card__footer"
-        const itemPrice = document.createElement("span")
-        itemPrice.textContent = `$${String(item.price)}`
-        itemPrice.className = "menu-item-card__price"
-        itemFooter.appendChild(itemPrice)
+        itemBody.appendChild(category);
+        itemBody.appendChild(itemName);
+        itemBody.appendChild(itemDesc);
 
-        const buttons = document.createElement("div")
-        buttons.style.padding = "0 16px 16px"
-        buttons.style.display = "flex"
-        buttons.style.gap = "8px"
-        const editBtn = document.createElement("button")
-        editBtn.className = "btn btn--secondary btn--sm btn--full"
-        editBtn.textContent = "Edit"
-        buttons.appendChild(editBtn)
-        const deleteBtn = document.createElement("button")
-        deleteBtn.className = "btn btn--danger btn--sm"
-        deleteBtn.textContent = "Delete Item"
-        buttons.appendChild(deleteBtn)
+        const itemFooter = document.createElement("div");
+        itemFooter.className = "menu-item-card__footer";
+        
+        const itemPrice = document.createElement("span");
+        itemPrice.textContent = `$${item.price}`;
+        itemPrice.className = "menu-item-card__price";
+        itemFooter.appendChild(itemPrice);
+
+        const buttons = document.createElement("div");
+        buttons.style.padding = "0 16px 16px";
+        buttons.style.display = "flex";
+        buttons.style.gap = "8px";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn btn--secondary btn--sm btn--full";
+        editBtn.textContent = "Edit";
+        
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn btn--danger btn--sm";
+        deleteBtn.textContent = "Delete Item";
+        
+        // Use _id for PouchDB consistency
         deleteBtn.addEventListener("click", () => {
-            menu.deleteItemConfirm.dataset.id = item.id;
-            menu.deleteItemModal.style.display = "flex"
-        })
+            menu.deleteItemConfirm.dataset.id = item._id || item.id;
+            menu.deleteItemModal.style.display = "flex";
+        });
 
-        card.appendChild(itemBody)
-        card.appendChild(itemFooter)
-        card.appendChild(buttons)
-        grid.appendChild(card)
+        buttons.appendChild(editBtn);
+        buttons.appendChild(deleteBtn);
+
+        card.appendChild(itemBody);
+        card.appendChild(itemFooter);
+        card.appendChild(buttons);
+        grid.appendChild(card);
     });
 }
 
-export function deleteItem(id: string) {
-    const menu = getMenu();
-    const updatedMenu = menu.filter(item => item.id !== id);
-    saveMenu(updatedMenu);
-    renderItems();
+export async function deleteItem(id: string) {
+    try {
+    const item = await dbMenu.get(id)
+    await dbMenu.remove(item)
+    await renderItems();
+    } catch (err) {console.error("Error", err)}
 }
-export function deleteCategory(id: string) {
-    const categories = getCategories();
-    const menu = getMenu();
-    // category id is stored on items in the `category` field
-    const isUsed = menu.some(item => item.category === id);
-    if (isUsed) {
-        alert("Cannot delete: This category still has items assigned to it!");
-        return;
+
+export async function deleteCategory(categoryId: string) {
+    try {
+        const menuResult = await dbMenu.allDocs({ include_docs: true });
+        const menuItems = menuResult.rows.map(row => row.doc as any);
+        
+        const isUsed = menuItems.some(item => item.category === categoryId);
+
+        if (isUsed) {
+            alert("Cannot delete: This category still has items assigned to it!");
+            return;
+        }
+        const categoryDoc = await dbCategories.get(categoryId);
+        await dbCategories.remove(categoryDoc);
+        await renderCategories(); 
+        
+    } catch (err) {
+        console.error("Error deleting category:", err);
     }
-    const updatedCategories = categories.filter(cat => cat.id !== id);
-    saveCategory(updatedCategories);
-    renderCategories();
 }
 
 

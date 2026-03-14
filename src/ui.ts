@@ -1,5 +1,6 @@
+import { dbCategories, dbMenu } from "./db.js";
 import { tab, menu, detail } from "./elements.js";
-import { createCategory, createItem, deleteCategory, deleteItem, renderItems } from "./menu.js";
+import { createCategory, createItem, deleteCategory, deleteItem, renderCategories, renderItems } from "./menu.js";
 import { saveMenu, getMenu, getCategories } from "./state.js";
 import { createTab, renderitems, renderTabs } from "./tabs.js";
 import { renderCategoriesSidebar } from "./tabs.js";
@@ -41,7 +42,7 @@ if (tab.createTabBtn && tab.tabModal) {
     });
 }
 
-const currentCategory = getCategories();
+
 let itemToDeleteId: string | null = null;
 
 function clearInput() {
@@ -57,21 +58,36 @@ function clearInput() {
 }
 
 if (menu.createItemBtn) {
-    menu.createItemBtn.addEventListener("click", () => {
+    // 1. Added 'async' here so the 'await' below works
+    menu.createItemBtn.addEventListener("click", async () => {
         menu.createItemModal.style.display = "flex";
 
         const selectElement = menu.itemCategory;
 
-        // empty select then populate categories
+        // Clear select then populate categories
         selectElement.innerHTML = '<option value="">Select a category</option>';
 
-        currentCategory.forEach((category) => {
-            const categoryItem = document.createElement("option");
-            categoryItem.value = category.name;
-            categoryItem.textContent = `${category.icon} | ${category.name}`;
-            selectElement.appendChild(categoryItem);
-        });
-        renderCategoriesSidebar()
+        try {
+            // 2. Fetch from the specific Categories database
+            const result = await dbCategories.allDocs({ include_docs: true });
+            
+            // 3. Map the rows to usable category objects
+            const allCategories = result.rows.map(row => row.doc as any);
+
+            // 4. Use 'allCategories' (the data we just fetched) to fill the dropdown
+            allCategories.forEach((category) => {
+                const categoryItem = document.createElement("option");
+                categoryItem.value = category.name;
+                // Using optional chaining (?) in case icon or name are missing
+                categoryItem.textContent = `${category.icon || '📁'} | ${category.name}`;
+                selectElement.appendChild(categoryItem);
+            });
+        } catch (err) {
+            console.error("Failed to load categories for dropdown:", err);
+        }
+
+        // 5. Assuming this is also async, we should await it
+        await renderCategories();
     });
 }
 

@@ -1,23 +1,43 @@
 import { tab, detail } from "./elements.js";
-import { saveTabs, getTabs, getMenu, getCategories } from "./state.js";
+import { saveTabs, getTabs, getMenu, getCategories,Tab } from "./state.js";
 import { isCategoryEmpty } from "./menu.js";
+import { dbTabs } from "./db.js";
 
-export function createTab(name: string, tableNumber: number) {
-    const tabs = getTabs()
-    const existingTab = getTabs().some(tab => tab.name.toLocaleLowerCase().trim() === name.toLocaleLowerCase().trim())
+export async function createTab(name: string, tableNumber: number) {
+    // 1. Check for duplicates (You'll need a 'getAllTabs' function for this)
+    const allTabs = await dbTabs.allDocs({ include_docs: true });
+    const existingTab = allTabs.rows.some(row => {
+    // We cast 'row.doc' as a Tab so TypeScript knows 'name' exists
+    const doc = row.doc as unknown as Tab; 
+    return doc?.name?.toLowerCase().trim() === name.toLowerCase().trim();
+});
+
     if (!existingTab && name && tableNumber) {
-        const newTab = {
+        const newTabId = crypto.randomUUID().toString();
+        
+        const newTab: Tab = {
+            id: newTabId,
+            _id: newTabId, // PouchDB needs this barcode!
             name: name,
             tableNumber: tableNumber,
             isOpen: true,
-            id: crypto.randomUUID().toString(),
             items: [],
             total: 0,
-            time: new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).format(Date.now())
+            time: new Intl.DateTimeFormat('en-GB', { 
+                hour: '2-digit', minute: '2-digit', hour12: false 
+            }).format(Date.now())
+        } as any; // 'as any' helps if your Tab interface doesn't have _id yet
+
+        // 2. The Actual Database Save
+        try {
+            await dbTabs.put(newTab);
+            console.log("Tab saved to DB!");
+            
+            // 3. Re-render your UI
+            await renderTabs(); 
+        } catch (err) {
+            console.error("Database save failed", err);
         }
-        tabs.push(newTab)
-        saveTabs(tabs)
-        renderTabs()
     }
 }
 export function deleteTab(id: string) {
@@ -37,99 +57,108 @@ export function getTabStats() {
 
 let totalrevenue: number = 0;
 let averageRevenue: number = 0
-export function renderTabs() {
-    const grid = document.querySelector("#tabs-grid-67") as HTMLDivElement | null
-    if (!grid) return; // Exit if element doesn't exist on this page
-    grid.innerHTML = ""; // clear existing cards before rendering
-    let totaltabs = getTabs().length
-    const totaltabstext = document.getElementById("total-tabs-open")! as HTMLSpanElement
-    console.log(totaltabs)
-    totaltabstext.textContent = totaltabs.toString()
-    document.getElementById("total-tabs-dashboard")!.textContent = totaltabs.toString()
-    const revenueDisplay = document.getElementById("total-revenue")!
-    const averageRevenueDisplay = document.getElementById("average-revenue")!
 
+// 1. Added 'async' here so 'await' works inside
+export async function renderTabs() {
+    const grid = document.querySelector("#tabs-grid-67") as HTMLDivElement | null;
+    if (!grid) return; 
 
-    const tabs = getTabs()
+    grid.innerHTML = ""; 
 
-    // Reset totalrevenue before calculating
-    totalrevenue = 0;
+    // 2. Fetch data from PouchDB
+    const result = await dbTabs.allDocs({ include_docs: true });
+    // We cast to 'any' or your 'Tab' type to avoid property errors
+    const allTabs = result.rows.map(row => row.doc as any);
 
-    tabs.forEach((tab) => {
+    // 3. Use the DB length for your counters
+    let totaltabs = allTabs.length;
+    
+    const totaltabstext = document.getElementById("total-tabs-open") as HTMLSpanElement;
+    const dashboardText = document.getElementById("total-tabs-dashboard");
+    const revenueDisplay = document.getElementById("total-revenue");
+    const averageRevenueDisplay = document.getElementById("average-revenue");
 
-        totalrevenue += tab.total
+    if (totaltabstext) totaltabstext.textContent = totaltabs.toString();
+    if (dashboardText) dashboardText.textContent = totaltabs.toString();
 
-        const card = document.createElement("article")
-        card.className = "tab-card"
-        const header = document.createElement("div")
-        header.className = "tab-card__header"
-        const table = document.createElement("div")
-        table.className = "tab-card__table"
-        table.textContent = `Table ${tab.tableNumber.toString()}`
-        const tableSection = document.createElement("div")
-        tableSection.className = "tab-card__table-sub"
-        tableSection.textContent = "WIP"
+    let currentTotalRevenue = 0;
 
-        const isactive = document.createElement("span")
-        isactive.className = "badge badge--active"
-        isactive.textContent = String(tab.isOpen)
+    allTabs.forEach((tab) => {
+        // Calculate revenue
+        currentTotalRevenue += (tab.total || 0);
 
-        const customer = document.createElement("div")
-        customer.className = "tab-card__customer"
-        customer.textContent = tab.name
+        const card = document.createElement("article");
+        card.className = "tab-card";
+        
+        const header = document.createElement("div");
+        header.className = "tab-card__header";
+        
+        const table = document.createElement("div");
+        table.className = "tab-card__table";
+        table.textContent = `Table ${tab.tableNumber}`;
 
-        const meta = document.createElement("div")
-        meta.className = "tab-card__meta"
+        const customer = document.createElement("div");
+        customer.className = "tab-card__customer";
+        customer.textContent = tab.name;
 
-        const items = document.createElement("span")
-        items.className = "tab-card__items-count"
-        items.textContent = `Total items: ${tab.items.length.toString()}`
-        const price = document.createElement("span")
-        price.className = "tab-card__total"
-        price.textContent = `Total $${tab.total}`
-        meta.appendChild(items)
-        meta.appendChild(price)
+        const meta = document.createElement("div");
+        meta.className = "tab-card__meta";
 
-        const time = document.createElement("div")
-        time.className = "tab-card__time label"
-        time.textContent = "WIP"
+        const items = document.createElement("span");
+        items.className = "tab-card__items-count";
+        items.textContent = `Total items: ${tab.items?.length || 0}`;
 
-        const actions = document.createElement("div")
-        actions.className = "tab-card__actions"
-        const view = document.createElement("a")
-        view.className = "btn btn--secondary btn--sm"
-        view.textContent = "View Tab"
-        actions.appendChild(view)
-        const deletebtn = document.createElement("button")
-        deletebtn.className = "btn btn--danger btn--sm"
-        deletebtn.textContent = "Close Tab"
-        actions.appendChild(deletebtn)
+        const price = document.createElement("span");
+        price.className = "tab-card__total";
+        price.textContent = `Total $${tab.total || 0}`;
+        
+        meta.appendChild(items);
+        meta.appendChild(price);
 
+        const time = document.createElement("div");
+        time.className = "tab-card__time label";
+        time.textContent = tab.time || "No time";
 
+        const actions = document.createElement("div");
+        actions.className = "tab-card__actions";
+        
+        const view = document.createElement("a");
+        view.className = "btn btn--secondary btn--sm";
+        view.textContent = "View Tab";
+        
+        const deletebtn = document.createElement("button");
+        deletebtn.className = "btn btn--danger btn--sm";
+        deletebtn.textContent = "Close Tab";
+        
+        actions.appendChild(view);
+        actions.appendChild(deletebtn);
 
+        // Event Listeners
         card.addEventListener("click", (e) => {
             if (e.ctrlKey) {
-                deleteTab(tab.id)
+                // Make sure deleteTab handles the PouchDB _id!
+                deleteTab(tab._id || tab.id); 
+            } else { 
+                openTabDetail(tab._id || tab.id); 
             }
-            else { openTabDetail(tab.id) }
-        })
+        });
 
-        header.appendChild(table)
-        card.appendChild(customer)
-        card.appendChild(meta)
-        card.appendChild(time)
-        card.appendChild(actions)
-        card.appendChild(header)
-        grid.appendChild(card)
-        console.log(totalrevenue)
-    })
+        // Assemble the card
+        header.appendChild(table);
+        card.appendChild(header); // Moved header to top for typical card layout
+        card.appendChild(customer);
+        card.appendChild(meta);
+        card.appendChild(time);
+        card.appendChild(actions);
+        
+        grid.appendChild(card);
+    });
 
-    // Calculate average after summing all totals
-    averageRevenue = totaltabs > 0 ? totalrevenue / totaltabs : 0;
+    // 4. Final Calculations
+    const avgRev = totaltabs > 0 ? currentTotalRevenue / totaltabs : 0;
 
-    // Update displays after the loop
-    revenueDisplay.textContent = `$${totalrevenue.toString()}`
-    averageRevenueDisplay.textContent = `$${averageRevenue.toFixed(2)}`
+    if (revenueDisplay) revenueDisplay.textContent = `$${currentTotalRevenue.toFixed(2)}`;
+    if (averageRevenueDisplay) averageRevenueDisplay.textContent = `$${avgRev.toFixed(2)}`;
 }
 
 function openTabDetail(id: string) {
