@@ -1,7 +1,7 @@
 import { tab, detail } from "./elements.js";
 import { saveTabs, getTabs, getMenu, getCategories,Tab } from "./state.js";
 import { isCategoryEmpty } from "./menu.js";
-import { dbTabs, dbCategories, dbMenu } from "./db.js";
+import { dbTabs, dbCategories, dbMenu, dbClosedtabs} from "./db.js";
 
 export async function createTab(name: string, tableNumber: number) {
     // 1. Check for duplicates (You'll need a 'getAllTabs' function for this)
@@ -76,13 +76,17 @@ export async function renderTabs() {
     const dashboardText = document.getElementById("total-tabs-dashboard");
     const revenueDisplay = document.getElementById("total-revenue");
     const averageRevenueDisplay = document.getElementById("average-revenue");
+    const openTabs = allTabs.filter((tab: any) => tab.isOpen == true);
+    const closedTabs = allTabs.filter((tab: any) => tab.isOpen !== true);
 
-    if (totaltabstext) totaltabstext.textContent = totaltabs.toString();
-    if (dashboardText) dashboardText.textContent = totaltabs.toString();
+    if (totaltabstext) totaltabstext.textContent = openTabs.length.toString()
+    if (dashboardText) dashboardText.textContent = openTabs.length.toString()
+    if (tab.closedtabs) tab.closedtabs.textContent = closedTabs.length.toString()
 
     let currentTotalRevenue = 0;
 
     allTabs.forEach((tab: any) => {
+        if (tab.isOpen){
         // Calculate revenue
         currentTotalRevenue += (tab.total || 0);
 
@@ -105,11 +109,11 @@ export async function renderTabs() {
 
         const items = document.createElement("span");
         items.className = "tab-card__items-count";
-        items.textContent = `Total items: ${tab.items?.length || 0}`;
+        items.textContent = `Total items: ${tab.items.length || 0}`;
 
         const price = document.createElement("span");
         price.className = "tab-card__total";
-        price.textContent = `Total $${tab.total || 0}`;
+        price.textContent = tab.items.length == 0 ? "0.00" : `$${tab.total.toString()}`  
         
         meta.appendChild(items);
         meta.appendChild(price);
@@ -128,6 +132,9 @@ export async function renderTabs() {
         const deletebtn = document.createElement("button");
         deletebtn.className = "btn btn--danger btn--sm";
         deletebtn.textContent = "Close Tab";
+        deletebtn.addEventListener("click", () => {
+            closeTab(tab.id)
+        })
         
         actions.appendChild(view);
         actions.appendChild(deletebtn);
@@ -135,9 +142,9 @@ export async function renderTabs() {
         // Event Listeners
         card.addEventListener("click", (e) => {
             if (e.ctrlKey) {
-                // Make sure deleteTab handles the PouchDB _id!
+                
                 deleteTab(tab._id || tab.id); 
-            } else { 
+            } else if (e.target != deletebtn){ 
                 openTabDetail(tab._id || tab.id); 
             }
         });
@@ -151,7 +158,7 @@ export async function renderTabs() {
         card.appendChild(actions);
         
         grid.appendChild(card);
-    });
+}});
 
     // 4. Final Calculations
     const avgRev = totaltabs > 0 ? currentTotalRevenue / totaltabs : 0;
@@ -190,6 +197,7 @@ async function renderTabDetails() {
     detail.totalPriceTab.textContent = (current.total + 9.77).toFixed(2)
     if (current.items.length == 0) {
         detail.totalPriceTab.textContent = "0.00"
+        detail.totalExclusiefVat.textContent = "0.00"
     }
 
     renderOrderedItems()
@@ -294,9 +302,9 @@ export async function renderitems(categoryFilter: string = "all") {
         detail.AddtoTabFinal.onclick = () => {
             if (selectedName) {
                 const q = parseInt(detail.totalQuantity.textContent || "1", 10) || 1;
+                addItem(selectedName, q);
                 quantity = 1
                 detail.totalQuantity.textContent = quantity.toString()
-                addItem(selectedName, q);
                 detail.AddItemModal.style.display = "none"
                 renderOrderedItems()
                 renderitems(categoryFilter);
@@ -360,9 +368,10 @@ export async function addItem(name: string, quantity: number) {
             price: menuItem.price * quantity,
             quantity: quantity
         }
+        console.log(orderItem)
         // add full cost (price times quantity)
         tab.total += Number(orderItem.price);
-        tab.items = [...(tab.items || []), menuItem];
+        tab.items = [...(tab.items || []), orderItem];
         await dbTabs.put(tab);
         isSelected = false
         detail.totalQuantity.textContent = "1"
@@ -372,27 +381,39 @@ export async function addItem(name: string, quantity: number) {
 
 }
 
-export function removeItem(index: number) {
-    // remove an item by its index from the current tab
-    const currentTabId = new URLSearchParams(window.location.search).get("id");
-    const tabs = getTabs();
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
+export async function removeItem(index: number) {
+    // 1. Haal het ID op uit de URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentTabId = urlParams.get("id");
 
-    if (!currentTab) return;
+    if (!currentTabId) return;
 
-    // make sure index is valid
-    if (index < 0 || index >= currentTab.items.length) return;
+    try {
+        // 2. Haal de VERSE data op uit de database (belangrijk voor de _rev)
+        const tab: any = await dbTabs.get(currentTabId);
 
-    const removed = currentTab.items[index];
-    // adjust total (price already accounts for quantity)
-    currentTab.total = Math.max(0, currentTab.total - removed.price);
-    // remove the item
-    currentTab.items.splice(index, 1);
+        // 3. Controleer of de index geldig is
+        if (index < 0 || index >= tab.items.length) return;
 
-    saveTabs(tabs);
-    // re-render details so UI reflects change (both item list and sidebar totals)
-    renderOrderedItems();
-    renderTabDetails();
+        // 4. Verwijder het item uit de array
+        const removedItem = tab.items[index];
+        tab.items.splice(index, 1);
+
+        // 5. Update het totaalbedrag (gebruik Math.max om nooit onder 0 te komen)
+        tab.total = Math.max(0, (tab.total || 0) - (removedItem.price || 0));
+
+        // 6. Sla het bijgewerkte document op in PouchDB
+        await dbTabs.put(tab);
+
+        console.log(`Item verwijderd. Nieuw totaal: €${tab.total.toFixed(2)}`);
+
+        // 7. Update de UI (Zorg dat deze functies ook async zijn indien nodig)
+        renderOrderedItems(); 
+        renderTabDetails();
+
+    } catch (err) {
+        console.error("Fout bij het verwijderen van item:", err);
+    }
 }
 
 export async function renderOrderedItems() {
@@ -405,13 +426,12 @@ export async function renderOrderedItems() {
     if (!currentTab) return;
 
     currentTab.items.forEach((item) => {
-        console.log(currentTab.items)
         const card = document.createElement("li")
         card.className = "order-item"
-        const quantity = document.createElement("span")
-        quantity.className = "order-item__qty"
-        quantity.textContent = item.quantity
-        card.appendChild(quantity)
+        const quantity5 = document.createElement("span")
+        quantity5.className = "order-item__qty"
+        quantity5.textContent = item.quantity
+        card.appendChild(quantity5)
 
         const info = document.createElement("div")
         info.className = "order-item__info"
@@ -435,7 +455,8 @@ export async function renderOrderedItems() {
         remove.className = "order-item__remove"
         remove.textContent = `Remove ${item.name}`
         // wire up removal using current index
-        remove.addEventListener("click", (e) => {
+        remove.addEventListener("click", () => {
+            console.log(currentTab.items.indexOf(item))
             const idx = currentTab.items.indexOf(item);
             if (idx !== -1) {
                 removeItem(idx);
@@ -453,5 +474,86 @@ export async function renderOrderedItems() {
 
 }
 
+
+export async function renderClosedTabs() {
+    const result = await dbTabs.allDocs({ include_docs: true });
+    const allTabs = result.rows.map(row => row.doc as any);
+    const grid = tab.closedtabsgrid
+    const closedTabs = allTabs.filter((tab: any) => tab.isOpen !== true);
+    const totalRevenue = closedTabs.reduce((sum: number, tab: any) => {
+    return sum + (tab.total || 0);
+    }, 0);
+    tab.totalclosedtabs.textContent = closedTabs.length.toString()
+    tab.revenueClosedtabs.textContent = totalRevenue
+
+    
+
+    allTabs.forEach((tab) => {
+        if (tab.isOpen == false) {
+            const card = document.createElement("tr")
+            const table = document.createElement("td")
+            table.textContent = tab.tableNumber
+            card.appendChild(table)
+            const name = document.createElement("td")
+            name.textContent = tab.name
+            card.appendChild(name)
+            const items = document.createElement("td")
+            items.className = "td--mono"
+            items.textContent = tab.items.length
+            card.appendChild(items)
+            const time = document.createElement("td")
+            time.className = "td--mono"
+            time.textContent = tab.time
+            card.appendChild(time)
+            const closedat = document.createElement("td")
+            closedat.className = "td--mono"
+            closedat.textContent = tab.closedAt
+            card.appendChild(closedat)
+            const total = document.createElement("td")
+            total.className = "td--total"
+            total.textContent = `$${tab.total}`
+            card.appendChild(total)
+            const settled = document.createElement("td")
+            const settled2 = document.createElement("span")
+            settled2.className = "badge badge--closed"
+            settled2.textContent = tab.isOpen ? "Broken" : "Settled"
+            settled.appendChild(settled2)
+            card.appendChild(settled)
+            const view = document.createElement("td")
+            const button = document.createElement("button")
+            button.className = "btn btn--ghost btn--sm"
+            button.textContent = "View"
+            view.appendChild(button)
+            card.appendChild(view)
+
+            grid.appendChild(card)
+        }
+    });
+}
+
+export async function closeTab(id: string) {
+    try {
+        // 1. WACHT op het resultaat van de database (VANDAAR DE AWAIT)
+        const tab: any = await dbTabs.get(id);
+
+        // 2. Nu is 'tab' een echt object met een _id en _rev
+        tab.isOpen = false;
+        tab.closedAt = new Intl.DateTimeFormat('en-GB', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            hour12: false 
+        }).format(Date.now());
+
+        // 3. Sla het gewijzigde object weer op
+        await dbTabs.put(tab);
+        
+        // 4. Update de interface
+        await renderTabs();
+    } catch (err) {
+        console.error("Kon tab niet sluiten:", err);
+    }
+}
+
 renderTabDetails();
+renderClosedTabs()
 renderTabs();

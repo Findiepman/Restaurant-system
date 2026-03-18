@@ -38,6 +38,11 @@ export const tab = {
     closeTabBtn: document.getElementById("close-tab-modal")! as HTMLButtonElement,
     tabModalBtn: document.getElementById("new-tab-btn")! as HTMLButtonElement,
     addItemModal: document.getElementById("modal-add-item")! as HTMLDivElement,
+    closedtabsgrid: document.getElementById("closed-tabs-grid")! as HTMLTableRowElement,
+    totalclosedtabs: document.getElementById("total-closed-tabs")! as HTMLSpanElement,
+    revenueClosedtabs: document.getElementById("revenue-closed-tabs")! as HTMLSpanElement,
+    averageRevenue: document.getElementById("average-revenue-closed")! as HTMLSpanElement,
+    closedtabs: document.getElementById("closed-tabs-index")! as HTMLSpanElement,
 }
 
 //tab-detail.html
