@@ -75,7 +75,7 @@ if (menu.createItemBtn) {
             const allCategories = result.rows.map(row => row.doc as any);
 
             // 4. Use 'allCategories' (the data we just fetched) to fill the dropdown
-            allCategories.forEach((category) => {
+            allCategories.forEach((category: any) => {
                 const categoryItem = document.createElement("option");
                 categoryItem.value = category.name;
                 // Using optional chaining (?) in case icon or name are missing

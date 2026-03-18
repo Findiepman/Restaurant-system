@@ -1,7 +1,7 @@
 import { tab, detail } from "./elements.js";
 import { saveTabs, getTabs, getMenu, getCategories,Tab } from "./state.js";
 import { isCategoryEmpty } from "./menu.js";
-import { dbTabs } from "./db.js";
+import { dbTabs, dbCategories, dbMenu } from "./db.js";
 
 export async function createTab(name: string, tableNumber: number) {
     // 1. Check for duplicates (You'll need a 'getAllTabs' function for this)
@@ -67,7 +67,6 @@ export async function renderTabs() {
 
     // 2. Fetch data from PouchDB
     const result = await dbTabs.allDocs({ include_docs: true });
-    // We cast to 'any' or your 'Tab' type to avoid property errors
     const allTabs = result.rows.map(row => row.doc as any);
 
     // 3. Use the DB length for your counters
@@ -83,7 +82,7 @@ export async function renderTabs() {
 
     let currentTotalRevenue = 0;
 
-    allTabs.forEach((tab) => {
+    allTabs.forEach((tab: any) => {
         // Calculate revenue
         currentTotalRevenue += (tab.total || 0);
 
@@ -165,13 +164,15 @@ function openTabDetail(id: string) {
     // navigate to detail page; the new page will run its own rendering logic
     window.location.href = `tab-detail.html?id=${id}`;
 }
-function renderTabDetails() {
+async function renderTabDetails() {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const tabId = urlParams.get('id');
     if (!tabId) return; // nothing to do when no id present
 
-    const allTabs = getTabs();
+    const result = await dbTabs.allDocs({ include_docs: true });
+    const allTabs = result.rows.map(row => row.doc as any);
+
     const current = allTabs.find(t => t.id === tabId);
     if (!current) return; // invalid id
 
@@ -195,9 +196,10 @@ function renderTabDetails() {
 }
 
 
-export function renderCategoriesSidebar() {
+export async function renderCategoriesSidebar() {
     const grid = document.getElementById("category-grid-sidebar")! as HTMLElement
-    let categories = getCategories()
+    const result = await dbCategories.allDocs({ include_docs: true });
+    const allCategories = result.rows.map(row => row.doc as any);
     grid.innerHTML = ""
     const allItems = document.createElement("button")
     allItems.className = "menu-category-link menu-category-link--active"
@@ -207,7 +209,7 @@ export function renderCategoriesSidebar() {
 
 
 
-    categories.forEach((category) => {
+    allCategories.forEach((category) => {
         const card = document.createElement("button")
         card.className = "menu-category-link"
         card.textContent = category.name
@@ -232,12 +234,13 @@ export function renderCategoriesSidebar() {
 
 }
 
-export function renderitems(categoryFilter: string = "all") {
+export async function renderitems(categoryFilter: string = "all") {
     const grid = document.getElementById("items-grid-item-picker") as HTMLDivElement | null;
     if (!grid) return;
     grid.innerHTML = "";
 
-    let menu = getMenu();
+    const result = await dbMenu.allDocs({ include_docs: true });
+    let menu = result.rows.map(row => row.doc as any);
     if (categoryFilter !== "all") {
         menu = menu.filter(item => item.category === categoryFilter);
         if (isCategoryEmpty(categoryFilter)) {
@@ -261,16 +264,16 @@ export function renderitems(categoryFilter: string = "all") {
 
     let selectedName: string | null = null;
 
-    menu.forEach((item) => {
+    menu.forEach((menuItem) => {
         const card = document.createElement("div");
         card.className = "item-picker-row";
         const itemName = document.createElement("span");
         itemName.className = "item-picker-row__name";
-        itemName.textContent = item.name;
+        itemName.textContent = menuItem.name;
         card.appendChild(itemName);
         const itemPrice = document.createElement("span");
         itemPrice.className = "item-picker-row__price";
-        itemPrice.textContent = `$${item.price}`;
+        itemPrice.textContent = `$${menuItem.price}`;
         card.appendChild(itemPrice);
 
         card.addEventListener("click", () => {
@@ -281,7 +284,7 @@ export function renderitems(categoryFilter: string = "all") {
             }
             card.classList.add("selected");
             card.style.border = "2px solid white";
-            selectedName = item.name;
+            selectedName = menuItem.name;
         });
 
         grid.appendChild(card);
@@ -327,7 +330,7 @@ if (detail.addOrderItemBtn && detail.AddItemModal) {
         detail.totalQuantity.textContent = quantity.toString();
         detail.AddItemModal.style.display = "flex";
         renderCategoriesSidebar()
-        renderitems()
+        renderitems("all")
     });
 }
 
@@ -338,16 +341,17 @@ let isSelected
 
 
 
-export function addItem(name: string, quantity: number) {
+export async function addItem(name: string, quantity: number) {
     // Get current tab id from URL
     const currentTabId = new URLSearchParams(window.location.search).get("id");
-    const tabs = getTabs();
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
+    const tab = await dbTabs.get(currentTabId);
+    
 
-    if (!currentTab) return;
+    if (!tab) return;
 
     // Find the menu item
-    const menu = getMenu();
+    const result = await dbMenu.allDocs({ include_docs: true });
+    let menu = result.rows.map(row => row.doc as any);
     const menuItem = menu.find(item => item.name === name);
 
     if (menuItem && quantity > 0) {
@@ -357,10 +361,9 @@ export function addItem(name: string, quantity: number) {
             quantity: quantity
         }
         // add full cost (price times quantity)
-        currentTab.total += menuItem.price * quantity;
-        console.log(currentTab.total);
-        currentTab.items.push(orderItem);
-        saveTabs(tabs);
+        tab.total += Number(orderItem.price);
+        tab.items = [...(tab.items || []), menuItem];
+        await dbTabs.put(tab);
         isSelected = false
         detail.totalQuantity.textContent = "1"
         renderOrderedItems()
@@ -392,22 +395,22 @@ export function removeItem(index: number) {
     renderTabDetails();
 }
 
-export function renderOrderedItems() {
+export async function renderOrderedItems() {
     const grid = detail.orderItemsList
     grid.innerHTML = ""
 
     const currentTabId = new URLSearchParams(window.location.search).get("id");
-    const tabs = getTabs();
-    const currentTab = tabs.find(tab => tab.id === currentTabId);
+    const currentTab = await dbTabs.get(currentTabId)
 
     if (!currentTab) return;
 
     currentTab.items.forEach((item) => {
+        console.log(currentTab.items)
         const card = document.createElement("li")
         card.className = "order-item"
         const quantity = document.createElement("span")
         quantity.className = "order-item__qty"
-        quantity.textContent = item.quantity.toString()
+        quantity.textContent = item.quantity
         card.appendChild(quantity)
 
         const info = document.createElement("div")
